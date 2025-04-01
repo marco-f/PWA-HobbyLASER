@@ -2,6 +2,8 @@
 
 A **Progressive Web App (PWA)** designed for the **HobbyLaser** project. This web-based application allows users to interact with drawing and monitoring features through an intuitive interface. The app is capable of running offline, providing a native-like experience on both mobile and desktop devices.
 
+![logo](IMG/anim.svg)
+
 ## Features
 
 - **Interactive Drawing**: Users can draw directly within the web interface.
