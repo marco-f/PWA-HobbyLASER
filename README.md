@@ -36,7 +36,7 @@ You can view a live demo of the PWA here:
 
 1. **Clone the repository** to your local machine:
    ```bash
-   git clone https://github.com/marco-f/PWA-HobbyLaser.git
+   git clone https://github.com/marco-f/PWA-HobbyLASER.git
    ```
 2. **Navigate to the project directory:
    ```bash
