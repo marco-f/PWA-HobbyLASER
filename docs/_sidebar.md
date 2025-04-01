@@ -1,0 +1,10 @@
+- [prefaces](intro.md)
+- Documentation
+  - [Web UI](UI.md)
+  - [Guida Utente](guida.md)
+  - [API](api.md)
+-️ Configuration
+  - [Installation](installation.md)
+  - [Impostazioni Avanzate](configurazione.md)
+- ❓ [FAQ](faq.md)
+- [Changelog](changelog.md)
