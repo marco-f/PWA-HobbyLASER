@@ -4,6 +4,12 @@ A **Progressive Web App (PWA)** designed for the **HobbyLaser** project. This we
 
 ![logo](IMG/anim.svg)
 
+<h2 align="center">Disclaimer</h2>
+<h3 align="center" color="red">**A CNC OR A LASER ARE NOT TOYS!** </h3> 
+<h4 align="center"> Using a CNC or laser without proper training and protection can cause serious injury and blindness. We do not accept any liability for damages resulting from the use of this software.</h4> 
+<h4 align="center"> 🔗 [Read more about laser safety](https://www.lasersafetyfacts.com/laserclasses.html) </h4>  
+<h4 align="center"> **ALWAYS WEAR SAFETY GLASSES!** </h4> 
+
 ## Features
 
 - **Interactive Drawing**: Users can draw directly within the web interface.
