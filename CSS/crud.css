@@ -1,0 +1,17 @@
+.container {position:relative;
+            display: flex;gap: 15px}
+
+#crud {position: absolute;
+      width:100%; height:auto;
+      overflowY: scroll; left:30px; top:0px; z-index:50}
+
+
+#posts {}
+
+#posts div {display: flex; align-items: center;
+        justify-content: space-between;  gap: 15px}
+
+.options {display: flex;gap: 15px}
+
+label {font-size:12px; cursor: pointer}
+

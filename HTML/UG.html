@@ -1,0 +1,240 @@
+<html>
+<style>
+        p {font-size:12px; line-height:1.5}
+        .content { 
+            position: absolute; 
+            top: 70px; 
+            left: 300px; 
+            background: transparent; 
+            user-select: none; 
+            z-index: 1000; 
+            overflow-y: auto; 
+            width: calc(100% - 350px); 
+            height: calc(100% - 90px); 
+            text-align: justify;
+        }
+        .content p {margin: 20px; font-size:12px}
+
+        .content::-webkit-scrollbar {width: 5px}
+
+        .content::-webkit-scrollbar-thumb {
+            background: #404040;
+            border-radius: 4px;
+            cursor: pointer
+        }
+</style>
+<body style="height:auto">
+
+        <p style="position:absolute; top:10px; width:100%; color:white; font-size:18px; text-align:center"><strong>UserGUIDE</strong></p>
+        <div style="position:absolute; top:90px; width:100%; left:30px; color:#0ff; pointer-events:none">
+                <p style="cursor:pointer"><strong>1. why?</strong></p>
+                <p style="cursor:pointer"><strong>2. get started</strong></p>  
+                <p style="cursor:pointer"><strong>3. examples</strong></p>
+        </div>       
+
+        <div class="content">
+
+                <p style="font-size:16px"><strong>PREFACE</strong></p>       
+                <p>This tool is designed to simplify the process of creating and modifying drawings and images for laser engraving and cutting.
+                You can easily create customized projects, make detailed modifications to your images, and generate the G-code necessary to control a GRBL-based CNC laser.</p>
+                <p>It arises from the need to manage the CNC laser without having to engage our main computer for long working sessions. The integration with an SBC (Single Board Computer)
+                and a web cam allows us Remote Control and Real-Time Monitoring, giving us the ability to make modifications during the processing phase.</p>
+                <p><strong>MAIN FEATURES</strong></p>
+                <p><strong>-- Creating and Modifying Drawings:</strong><br> HobbyLaser offers the ability to create vector drawings through parametric scripts. You can draw from scratch or import
+                existing images (SVG generated with Inkscape) to modify them according to your needs.<br><br>
+                <strong>-- Generating G-code:</strong> Once your project is completed, HobbyLaser automatically converts the drawing into G-code, ready to be sent to the CNC laser.
+                This process ensures optimal precision and control during cutting and engraving.<br><br>
+                <strong>-- AI Integration:</strong><br> Artificial Intelligence, leveraging a phenomenon called 'divergence' (comparison between theoretical and actual), will alert us and put the
+                machine in safety mode, allowing us the opportunity to intervene.<br><br></p>
+
+
+                <p><strong>GRAPHICAL INTERFACE</strong></p>
+                <p>The interface features a drawing area, a script editor, a command line, a log console, interactive rulers (and guidelines), dropdown menus, a server monitor, and a user guide.
+                In the dropdown menu, we find the classic options: Open (hobbyLaser project), Import (.svg, .png, .jpg, .dxf is experimental), Save as (HobbyLaser project), Download (file specific to FS).<br>
+                The rulers display steps in pixels, but the drawings will be created in millimeters. An idea of the actual dimensions can be obtained through the rendering tool. The drawing area consists
+                of a grid (snap to grid is default), which can be configured through specific commands.<br>
+                The console area (height adjustable) offers space for any logs, and the server monitor reports the status of the SBC.<br>
+                The command line is the control tool for HobbyLaser; by entering simple commands, we can access all functionalities. Refer to this guide to discover them.<br>
+                The scripting area (iavascript) allows us to create the points of SVG paths that will be seen in the drawing area. HobbyLaser is a parametric CAD, which means it is a computer-aided design
+                system that uses parameters to define the geometric characteristics of a model. The parameters can be numerical variables, equations, or geometric relationships, and they allow easy
+                modification of the model by changing the parameter values.<br><br></p>
+
+                <p>To create models, we will use three tools: polyline, polygon, text.<br>
+                To combine and manipulate models, we use the Boolean functions union, difference, and intersection; for transformations, we can use the functions translate, scale, resize, mirror, offset,
+                rotate and skew X and Y.</p>
+                <p><strong>POLYLINE</strong><br>
+                The 'polyline' tool allows us to create paths of lines and Bezier curves (quadratic by default) using the mouse. A left click, move, and left click will create a line; a left click, drag,
+                and release will create a curve (scroll to zoom), and with shortcuts, we will have the ability to add/remove points, switch Beziers from quadratic to cubic, close the path, and exit the tool.<br></p>
+                <p>e.g.<br>
+                In the command line, type: polyline() (including the parentheses). The tooltip area will show a list of shortcuts: we can start drawing our design by clicking the mouse; closing the segment
+                is not necessary: right-click closes the path and exits the tool.<br> 
+                In the script area, the following will appear: "var _1 = PV['p_1'];" to which we will need to add return _1 (the 'return' will always refer to the variable we want to display);
+                NOTE that the variable names '_num.' are automatic, so if we declare other variables, we must use a different system. At this point, right-click in the script area, then 'exec,' and the SVG path
+                will reappear in the drawing area.</p>
+
+
+                
+                <p><strong>POLYGON</strong><br>
+                The 'polygon' tool creates regular polygons by specifying the number of sides, the X and Y position of the center, and the radius size.</p>
+                <p><strong>TEXT</strong><br>
+                The 'text' tool creates paths corresponding to text strings by specifying the font type, font size, start X and Y positions, and the value of the string.<br><br></p>
+
+
+                <p style="font-size:16px"><strong>PREFACE</strong></p>       
+                <p>This tool is designed to simplify the process of creating and modifying drawings and images for laser engraving and cutting.
+                You can easily create customized projects, make detailed modifications to your images, and generate the G-code necessary to control a GRBL-based CNC laser.</p>
+                <p>It arises from the need to manage the CNC laser without having to engage our main computer for long working sessions. The integration with an SBC (Single Board Computer)
+                and a web cam allows us Remote Control and Real-Time Monitoring, giving us the ability to make modifications during the processing phase.</p>
+                <p><strong>MAIN FEATURES</strong></p>
+                <p><strong>-- Creating and Modifying Drawings:</strong><br> HobbyLaser offers the ability to create vector drawings through parametric scripts. You can draw from scratch or import
+                existing images (SVG generated with Inkscape) to modify them according to your needs.<br><br>
+                <strong>-- Generating G-code:</strong> Once your project is completed, HobbyLaser automatically converts the drawing into G-code, ready to be sent to the CNC laser.
+                This process ensures optimal precision and control during cutting and engraving.<br><br>
+                <strong>-- AI Integration:</strong><br> Artificial Intelligence, leveraging a phenomenon called 'divergence' (comparison between theoretical and actual), will alert us and put the
+                machine in safety mode, allowing us the opportunity to intervene.<br><br></p>
+
+
+                <p><strong>GRAPHICAL INTERFACE</strong></p>
+                <p>The interface features a drawing area, a script editor, a command line, a log console, interactive rulers (and guidelines), dropdown menus, a server monitor, and a user guide.
+                In the dropdown menu, we find the classic options: Open (hobbyLaser project), Import (.svg, .png, .jpg, .dxf is experimental), Save as (HobbyLaser project), Download (file specific to FS).<br>
+                The rulers display steps in pixels, but the drawings will be created in millimeters. An idea of the actual dimensions can be obtained through the rendering tool. The drawing area consists
+                of a grid (snap to grid is default), which can be configured through specific commands.<br>
+                The console area (height adjustable) offers space for any logs, and the server monitor reports the status of the SBC.<br>
+                The command line is the control tool for HobbyLaser; by entering simple commands, we can access all functionalities. Refer to this guide to discover them.<br>
+                The scripting area (iavascript) allows us to create the points of SVG paths that will be seen in the drawing area. HobbyLaser is a parametric CAD, which means it is a computer-aided design
+                system that uses parameters to define the geometric characteristics of a model. The parameters can be numerical variables, equations, or geometric relationships, and they allow easy
+                modification of the model by changing the parameter values.<br><br></p>
+
+                <p>To create models, we will use three tools: polyline, polygon, text.<br>
+                To combine and manipulate models, we use the Boolean functions union, difference, and intersection; for transformations, we can use the functions translate, scale, resize, mirror, offset,
+                rotate and skew X and Y.</p>
+                <p><strong>POLYLINE</strong><br>
+                The 'polyline' tool allows us to create paths of lines and Bezier curves (quadratic by default) using the mouse. A left click, move, and left click will create a line; a left click, drag,
+                and release will create a curve (scroll to zoom), and with shortcuts, we will have the ability to add/remove points, switch Beziers from quadratic to cubic, close the path, and exit the tool.<br></p>
+                <p>e.g.<br>
+                In the command line, type: polyline() (including the parentheses). The tooltip area will show a list of shortcuts: we can start drawing our design by clicking the mouse; closing the segment
+                is not necessary: right-click closes the path and exits the tool.<br> 
+                In the script area, the following will appear: "var _1 = PV['p_1'];" to which we will need to add return _1 (the 'return' will always refer to the variable we want to display);
+                NOTE that the variable names '_num.' are automatic, so if we declare other variables, we must use a different system. At this point, right-click in the script area, then 'exec,' and the SVG path
+                will reappear in the drawing area.</p>
+
+
+                
+                <p><strong>POLYGON</strong><br>
+                The 'polygon' tool creates regular polygons by specifying the number of sides, the X and Y position of the center, and the radius size.</p>
+                <p><strong>TEXT</strong><br>
+                The 'text' tool creates paths corresponding to text strings by specifying the font type, font size, start X and Y positions, and the value of the string.<br><br></p>
+
+
+         </div>                
+                
+        <script>        
+      
+        </script>
+</body>        
+</html>
+
+
+<!--
+var _1 = use(PV['p_1'])
+var numObjects = 14
+var radius = 100
+var svgContent = ''
+
+for (let i = 0; i < numObjects; i++){
+    var angle = (i / numObjects) * 2 * Math.PI
+    var xOffset = radius * Math.cos(angle)
+    var yOffset = radius * Math.sin(angle)
+
+    var trans = use(_1).translate(xOffset, yOffset)
+    svgContent += SVG(trans)
+} return svgContent
+
+
+var _1 = use(PV['p_1']) 
+var numObjects = 14
+var radius = 100
+var svgContent = ''
+
+for (let i = 0; i < numObjects; i++){
+    var angle = (i / numObjects) * 360 
+
+    var trans = use(_1).translate(radius, 0).rotate(angle)
+    svgContent += SVG(trans)
+} return svgContent
+
+
+function createGearPath(numberOfTeeth, radius, heightOfTooth){
+    var paths = [[]]    
+    var centerX = 80
+    var centerY = 20
+    var radiusMinusTeeth = radius - heightOfTooth;
+
+    var distancesOfVerticesFromCenter = [
+        radius,
+        radius,
+        radiusMinusTeeth,
+        radiusMinusTeeth,
+    ]
+    var verticesPerTooth = distancesOfVerticesFromCenter.length
+    var numberOfVertices = numberOfTeeth * verticesPerTooth
+
+    for (var v = 0; v < numberOfVertices; v++) {
+        var angleInRadians = (Math.PI * 2 * v) / numberOfVertices
+        var distanceOfVertexFromCenter = distancesOfVerticesFromCenter[v % verticesPerTooth]
+
+        var drawPosX = centerX + distanceOfVertexFromCenter * Math.cos(angleInRadians)
+        var drawPosY = centerY + distanceOfVertexFromCenter * Math.sin(angleInRadians)
+
+        paths[0].push({ X: drawPosX, Y: drawPosY })        
+    }
+    return paths
+} return createGearPath(15, 50, 10)
+
+
+var _1 = use(PV['p_1']).offset(10)
+var _2 = use(PV['p_1']);
+var a = difference(_1,_2); return SVG(a)
+
+
+
+
+var _1 = use(PV['p_1']);
+var _2 = use(PV['p_2']);
+var _3 = use(PV['p_3']);
+var a = union(_1,_2,_3); return SVG(a)
+
+per combinare e i modelli utilizziamo le funzioni boolene di unione, differenza, e intersezione; per le trsformazioni possiamo utilizzare le funzioni translate, scale, resize, mirror, offset e skew X e Y 
+
+
+
+                <p><strong>INTERFACCIA GRAFICA</strong></p>
+                <p>Si presenta con un'area di disegno, un editor di script, una riga di comando, una console di log, righelli interattivi (e guideLines), menu a discesa, server monitor e user guide.
+                Nel menu a discesa troviamo i classici Open (hobbyLaser project), Import (.svg, .png, .jpg, .dxf è sperimentale), Salva as (HobbyLaser project), Download (file specifico a FS)<br>
+                I righelli visualizzano passi in pixels ma i disegni saranno creati in millimetri un' idea delle effettive dimensioni l'avremmo tramite lo strumento di render. L'area di disegno è
+                costituita da una griglia (lo snap alla griglia è di default), i cui setteggi avvengono tramite gli appositi comandi.<br>
+                L'area di console (ridimensionabile in altezza) offre lo spazio per gli eventuali log e il server monitor riferisce lo stato della SBC.<br>
+                La riga di comando è lo strumento di controllo di HobbyLaser mediante l'inserimento di semplici comandi avremo l'accesso a tutte le funzionalità, fare riferimento alla presente guida
+                per scoprirli.<br>
+                L'area di scripting ci permette di creare i punti degli SVG path che si vedranno nellarea di disegno, HobbyLaser è un CAD parametrico cioè un sistema di progettazione assistita
+                da computer che utilizza parametri per definire le caratteristiche geometriche di un modello. I parametri possono essere variabili numeriche, equazioni o relazioni geometriche,
+                e consentono di modificare facilmente il modello cambiando i valori dei parametri stessi.<br><br></p>
+
+
+                <p>Per realizzare i modelli ci avvarremo di tre strumenti: polilinea, poligono, testo.</p><br>
+                <p><strong>POLYLINE</strong></p>
+                <p>La 'polilinea' ci permette di creare tracciati di linee e curve bezier (quadradiche di default) a mezzo mouse, left click, muovi e left click creeranno una linea; left click, drag and up
+                creeranno una curva (scroll zoom) e grazie alle shortcut avremo la possibilità di aggiungere / rimuovere punti, passare le bezier da quadratic a cubic, chiudere il tracciato e lasciare lo strumento.<br>
+                <p>e.g.<br>
+                Nella riga di comando digitiamo: polyline() (incluse le parentesi). Nell'area tooltip apparirà la lista delle shortcut: possiamo cominciare a tracciare, mediante i click del mouse il nostro
+                disegno, il segmento di chiusura non è necessario: right click chude il tracciato e lascia lo strumento. Dall'area di disegno sparirà il tracciato (non è ancora stato creto abbiamo solo ottenuto
+                i comandi svg che lo compongono) nell' area di script apparirà: "var _1 = addPOLYLINE( < SVG path > );" a cui dovremo aggiungere return _1 (il 'return' farà sempre riferimento alla variabile
+                che vogliamo visualizzare); ATTENZIONE il nome delle variabili _num. è automatico, pertanto se dichiarimo altre variabili utilizzare un sistema diverso. A questo punto right click nell'area
+                di scrip quindi 'exec' e nell'area di disegno ricomparirà l' SVG path.</p>
+
+                <p><strong>POLYGON</strong></p>
+                <p>Lo strumento 'poligono' creerà poligoni regolari dichiarando numero dei lati, posizione X e Y del centro e misura del raggio.</p
+                <p><strong>TEXT</strong></p>
+                <p>Lo strumento 'testo' creerà path corrispondendi a stringhe di testo dichiarando tipo del font, misura del font, start X e Y, valore della stringa.<br><br></p>                                        
+-->
+

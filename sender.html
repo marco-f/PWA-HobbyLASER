@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple PWA</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="app.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        textarea { width: 100%; height: 200px; margin-top: 10px; }
+        button { margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Invia G-Code a Arduino</h1>
+    <button id="connect">Connetti</button>
+    <textarea id="gcodeInput" placeholder="Inserisci il G-Code qui..."></textarea>
+    <button id="sendFile">Invia</button>
+    <button id="pause">Pausa</button>
+    <button id="resume">Riprendi</button>
+    <button id="stop">Stop</button>
+    <div id="log"></div>
+
+    <script>
+        let port;
+        let writer;
+        let reader;
+        let gcodeText = "";
+        let currentIndex = 0;
+        let isPaused = false;
+        let stopRequested = false;
+        let isSending = false;
+        let lastReceivedLine = "";
+        const MAX_RETRIES = 2;
+        const RETRY_DELAY = 100;
+
+        document.getElementById('connect').addEventListener('click', async () => {
+            try {
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 115200 });
+                writer = port.writable.getWriter();
+                reader = port.readable.getReader();
+                logMessage("✅ Connesso al dispositivo.");
+                readSerialData();
+            } catch (err) {
+                logMessage("❌ Errore connessione: " + err);
+            }
+        });
+
+        document.getElementById('sendFile').addEventListener('click', async () => {
+            gcodeText = document.getElementById('gcodeInput').value;
+            if (port && gcodeText.trim()) {
+                currentIndex = 0;
+                isPaused = false;
+                stopRequested = false;
+                isSending = true;
+                sendNextLine();
+            } else {
+                logMessage("⚠️ Connetti il dispositivo e inserisci il G-Code prima di inviare.");
+            }
+        });
+
+        document.getElementById('pause').addEventListener('click', () => {
+            isPaused = true;
+            logMessage("⏸️ Trasmissione in pausa.");
+        });
+
+        document.getElementById('resume').addEventListener('click', () => {
+            if (isPaused) {
+                isPaused = false;
+                logMessage("▶️ Ripresa trasmissione...");
+                sendNextLine();
+            }
+        });
+
+        document.getElementById('stop').addEventListener('click', async () => {
+            stopRequested = true;
+            isSending = false;
+            logMessage("🛑 Trasmissione interrotta.");
+            if (port) {
+                await reader.cancel();
+                reader.releaseLock();
+                writer.releaseLock();
+                await port.close();
+                port = null;
+                logMessage("🔌 Connessione chiusa.");
+            }
+        });
+
+        async function sendNextLine() {
+            if (stopRequested || isPaused) return;
+            
+            const lines = gcodeText.split('\n');
+            if (currentIndex < lines.length) {
+                const line = lines[currentIndex].trim();
+                if (line && !line.startsWith(';')) {
+                    await sendCommand(line + "\n");
+                    logMessage("📤 Inviato: " + line);
+                    await waitResponse(line, 0);
+                } else {
+                    currentIndex++;
+                    sendNextLine();
+                }
+            } else {
+                isSending = false;
+                logMessage("✅ Trasmissione completata.");
+            }
+        }
+
+        async function sendCommand(command) {
+            if (port && writer) {
+                await writer.write(new TextEncoder().encode(command));
+            }
+        }
+
+async function waitResponse(line, attempts = 0) {
+
+
+    if (attempts >= MAX_RETRIES) {
+        logMessage(`⚠️ Timeout: Nessuna risposta 'OK' dopo ${MAX_RETRIES} tentativi.`);
+        return;
+    }
+
+    try {
+        // Aspetta un po' prima di riprovare
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+
+        if (lastReceivedLine.trim().toLowerCase() === "ok") {
+            logMessage(`✅ Risposta 'OK' ricevuta per il comando: ${line}`);
+            currentIndex++;  // Passa al prossimo comando
+            sendNextLine();  // Invia il prossimo comando se presente
+        } else if (lastReceivedLine.toLowerCase().startsWith("error:")) {
+            const errorCode = lastReceivedLine.split(":")[1].trim();
+            logMessage(`❌ Errore ricevuto da GRBL: ${errorCode}`);
+            // Puoi anche aggiungere un'azione per gestire gli errori (ad esempio un reset)
+            if (attempts < MAX_RETRIES) {
+                logMessage(`Tentativo ${attempts + 1} di invio della riga.`);
+                await sendGCodeLine(line, attempts + 1);  // Ritenta l'invio
+            } else {
+                logMessage(`⚠️ Errore irreversibile: ${errorCode}`);
+            }
+        } else if (lastReceivedLine.toLowerCase().startsWith("alarm:")) {
+            // Gestisci gli allarmi
+            const alarmCode = parseInt(lastReceivedLine.match(/\d+/)[0]);
+            logMessage(`🚨 Allarme GRBL ricevuto: ${alarmCode}`);
+
+            if ([2, 4, 5, 7, 10].includes(alarmCode)) {
+                logMessage(`Tentativo di reset automatico per allarme ${alarmCode}...`);
+                await softReset();
+            } else if ([1, 3, 6].includes(alarmCode)) {
+                logMessage(`Soft reset + Homing necessari per allarme ${alarmCode}...`);
+                await softReset();
+                await homing();
+            } else {
+                logMessage(`⚠️ Allarme sconosciuto, controllo manuale necessario.`);
+            }
+        } else {
+            logMessage(`Risposta non valida: ${lastReceivedLine}`);
+        }
+    } catch (error) {
+        logMessage(`❌ Errore nella gestione della risposta: ${error.message}`);
+    }
+}
+
+// Funzione per eseguire un soft reset
+async function softReset() {
+    logMessage("🔄 Eseguito soft reset...");
+    await sendGCodeLine("~");  // Comando per soft reset in GRBL
+}
+
+// Funzione per eseguire l'homing
+async function homing() {
+    logMessage("🔄 Eseguito homing...");
+    await sendGCodeLine("$H");  // Comando per homing in GRBL
+}
+
+        async function readSerialData() {
+            let buffer = "";
+            try {
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    buffer += new TextDecoder().decode(value);
+                    const lines = buffer.split("\n");
+                    buffer = lines.pop();
+                    for (const line of lines) {
+                        const trimmedLine = line.trim();
+                        if (trimmedLine) {
+                            lastReceivedLine = trimmedLine;
+                        }
+                    }
+                }
+            } catch (error) {
+                logMessage("⚠️ Errore lettura seriale: " + error);
+            } finally {
+                reader.releaseLock();
+            }
+        }
+
+            const maxLogLines = 20;
+            const logBuffer = [];
+        function logMessage(msg) {
+
+            if (logBuffer.length > maxLogLines) {
+                logBuffer.shift();
+            }
+            logBuffer.push(`<p>${msg}</p>`);
+            log.innerHTML = logBuffer.join("");
+            log.scrollTop = log.scrollHeight;
+        }
+    </script>
+</body>
+</html>
+
+
+
+
