@@ -1,4 +1,4 @@
-<!-- public/HTML/desktop.html -->
+<!-- public/HTML/main.html -->
 <!DOCTYPE html>
 <html xml:lang="en" lang="en">
         <head>
@@ -29,6 +29,9 @@
                 <script src="../JS/src/polyfill.js"></script>
                 <script src="../JS/src/drawing.js"></script>
                 <script src="../JS/src/ruler.js"></script>
+                
+                <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script> 
+
         </head>
 
         <style>
@@ -93,23 +96,23 @@
                 .ace_tooltip {display: none !important} 
                 #TA.closed {transform: translateX(100%)}                   
 
-                #output { border: 1px solid #ccc; height: 300px; overflow-y: auto; margin-top: 10px; padding: 5px; background: #f9f9f9; white-space: pre-wrap; font-size: 12px; text-align: left }
+                #output {border:1px solid #ccc; height:300px; overflow-y:auto; margin-top:10px; padding:5px; background:#f9f9f9; white-space:pre-wrap; font-size:12px; text-align:left}
 
-                .pending { color: blue }
-                .received { color: green }
+                .pending {color: blue}
+                .received {color: green}
 
-                .container { display: flex; justify-content:left; gap: 20px; align-items: center; margin: 20px; 20px }
+                .container {display:flex; justify-content:left; gap:20px; align-items: center; margin:20px; 20px}
                     
-                #controller { display: grid; grid-template-columns: repeat(3, 40px); gap: 10px; }
+                #controller {display:grid; grid-template-columns:repeat(3, 40px); gap:10px}
                     
-                .btn { width: 40px; height: 40px; font-size:20px; text-align: center; line-height: 40px; background: #ddd; cursor: pointer; border-radius: 20px; }
-                .btn:hover { background: #ccc; }
-                .home { background: orange; }
+                .btn {width: 40px; height: 40px; font-size:20px; text-align: center; line-height: 40px; background: #ddd; cursor: pointer; border-radius: 20px}
+                .btn:hover { background: #ccc}
+                .home {background: orange}
 
-                .z-controls { display: flex; flex-direction: column; gap: 10px; }
+                .z-controls {display: flex; flex-direction: column; gap: 10px}
 
-                .input-group { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
-                input, select { width: 100px; text-align: center; padding: 5px; font-size: 16px; }
+                .input-group {margin-top: 10px; display: flex; flex-direction: column; gap: 5px}
+                input, select {width: 100px; text-align: center; padding: 5px; font-size: 16px}
                                  
                 #progress-container {
                         width: 100%;
@@ -123,28 +126,48 @@
 
                 .fade_2 {opacity: 0; transition: opacity 2s ease-in-out}
 
-.gnu-license-link {
-        color: white; 
-        text-decoration: none;
-        font-weight: bold; 
-}
+                #crud-wrapper {
+                        position: absolute;
+                        width:450px; top:50px; right:0px;
+                }
+                #crud {
+                        flex-direction: column;            
+                        padding: 2px 2px 2px 0px;            
+                        display:flex; max-width:450px;    
+                        position:relative; overflow-y:auto;
+                }
 
-.gnu-license-link:hover {
-        color: #32CD32; text-decoration: underline
-}
-                                                              
+                #fileList {
+                        width: 100%;
+                        list-style: none;
+                        padding: 0; margin: 0;
+                }
+
+                #fileList li {
+                        font-size:12px;
+                        display: flex;
+                        align-items: center;
+                        padding: 2px; width: 100%;
+                        justify-content: space-between;    
+                }
+
+                .button-container {
+                        display: flex; gap: 10px;
+                        justify-content: flex-end;    
+                }                                                                                                                      
         </style>
                                                               
         <body>
                         <div id="splash" style="z-index:10; position:absolute; width:100%; height:100%; left:50%; transform:translateX(-50%)">
                                 <script>
                                         $(document).ready(function(){
-                                                $("#splash").load("../HTML/anim.html", function(){
+                                                /*$("#splash").load("../HTML/anim.html", function(){
                                                         setTimeout(() => {
                                                                 $("#splash").addClass("fade_2")
-                                                                setTimeout(() => { $("#splash").remove(); }, 2000)
+                                                                setTimeout(() => { $("#splash").remove(); }, 2000); TAOpen()
                                                         }, 3000)
-                                                })
+                                                })*/
+                                                TAOpen()
                                         })
                                 </script>
                         </div>
@@ -407,7 +430,7 @@
         }
         return use(paths);
 }
-//module(15, 20, 4).gcode()
+module(15, 20, 4).gcode()
 `);
                                         editor.clearSelection();
                                         editor.moveCursorTo(0, 0);
@@ -546,8 +569,6 @@
                                         }
                                         ftr();
 
-
-
                                         var cnsLog = document.getElementById('cnsLog');
                                         function logging(){
                                                 function customLog(type, color, ...args){
@@ -581,12 +602,15 @@
                                                         customLog('error', '#b3d5e0', ...args)
                                                 }
                                                 console.log('Copyright © 2020-2024 HobbyLaser dev. This program is free software; under the terms of the GNU\
-                                                General Public License as published by the Free Software Foundation', 'https://www.gnu.org/licenses/licenses.html')
+                                                General Public License as published by the Free Software Foundation', 'https://www.gnu.org/licenses/licenses.html')   
                                         }; logging()
-                                        window.setInterval(function() {
-                                                var elem = document.getElementById('cnsLog')
-                                                elem.scrollTop = elem.scrollHeight
-                                        }, 1000)     
+                                        var scrollTimeout
+                                        var observer = new MutationObserver(() => {
+                                                if (scrollTimeout) clearTimeout(scrollTimeout)
+                                                scrollTimeout = setTimeout(() => {
+                                                        cnsLog.scrollTop = cnsLog.scrollHeight
+                                                }, 100)
+                                        }); observer.observe(cnsLog, { childList: true })   
 
                                         var objNumber = 0;
                                         // Function to log the number of objects on the canvas (if applicable)
@@ -707,7 +731,6 @@
                                </div>                     
                         </div>                                  
 
-
                         <p class="bs" style="width:100%; top:265px; text-align:center">* download if you need to keep the file</p>
                                
                         <script>                       
@@ -750,96 +773,27 @@
                                 <div id="progress-bar"></div>
                         </div>                
 
-                        <div id="log-cont" style="position:absolute; left:0px; height:calc(100% - 80px);
-                        width:290px; top:20px"> 
+                        <div id="log-cont" style="position:absolute; left:0px; height:calc(100% - 80px); width:290px; top:20px"> 
                                 <div id="log" style="padding-left:10px"></div>
                         </div>              
 
                         <!-- Canvas per la preview statica -->
                         <canvas id="preview" style="position:absolute; left:300px; top:20px; z-index:1; border: 1px solid #ccc"></canvas>
                   
-                        <p style="position:absolute; top:0px; right:260px; font-size:13px">OUTPUT/<p>
+                        <p style="position:absolute; top:0px; right:460px; font-size:13px">OUTPUT/<p>
                         <p class="btImg" style="top:0px; right:15px; font-size:10px; width:20px" onclick='GCSenderHide()'>X<p>
                                       
-                        <p style="position:absolute; top:20px; right:200px; font-size:13px; width:100px">└── GCODE/<p>
-                                     
-                        <div id="crud" style="z-index:100">
-                                <div id="posts"></div>
-
-                                <script>
-
-                                        //i = 'add '; formValidation(i)
-
-                                        var posts = document.getElementById("posts")
-                                        var data = {}
-
-                                        var formValidation = function(i){
-                                                //if(input.value != ""){data["text"] = input.value; createPost(i)}
-                                                createPost(i)
-                                        }
-
-                                        var createPost = function(i){
-                                                posts.innerHTML += `<div>
-                                                                <p class="options" style="cursor:default; line-height:1.1; margin: 2px 0">├── ${i}</p>
-                                                                <p class="options" style="cursor:pointer; line-height:1.1; margin: 2px 0">
-                                                                        <label style="cursor:pointer; color:#fff; margin-right: 30px" " onClick="setPost(this)">set</label>
-                                                                        <label style="cursor:pointer; color:#fff;" onClick="delPost(this)">del.</label>
-                                                                </p>
-                                                        </div>`
-                                                var elem = document.getElementById('crud')
-                                                elem.scrollTop = elem.scrollHeight                        
-                                        }
-
-                                        var delPost = function(e){
-                                                e.parentElement.previousElementSibling.innerText
-                                                e.parentElement.parentElement.remove()
-                                        }
-                                        var setPost = function(e){
-                                                var fileName = e.parentElement.previousElementSibling.innerText.replace("├── ", "").trim()
-                                                fetch(`/output/${fileName}`)
-                                                        .then(response => {
-                                                            if (!response.ok) {
-                                                                    throw new Error(`error: ${response.statusText}`)
-                                                            }
-                                                            return response.text()
-                                                        })
-                                                        .then(rawGcode => {
-                                                                lines = rawGcode.split("\n");
-                                                                totalGCodeLines = lines.length;
-                                                                calculateBounds(rawGcode)
-                                                                gcVIEW(rawGcode)
-                                                        })
-                                                        .catch(error => console.error("error:", error));
-                                        };
-                                         
-                                        window.setInterval(function(){
-                                                var elem = document.getElementById('crud')
-                                                elem.scrollTop = elem.scrollHeight
-                                        }, 2000)
-                                        var sortable = new Sortable(posts, {
-                                                animation: 150,  ghostClass: 'ghost', 
-                                                onEnd: function(evt) {console.log("from " + evt.oldIndex + " to " + evt.newIndex)}
-                                        })                         
-                                        Array.prototype.diff = function(a){
-                                                return this.filter(function(i){return a.indexOf(i) < 0})
-                                        }
-
-                                        function generateString(){
-                                                var options = document.querySelectorAll("#posts > div > .options:first-child");
-                                                var values = Array.from(options).map(option => option.textContent.trim().replace("├──", "").trim());
-                                                console.log("Concatenated Values as Array:", values); concGC(...values)
-                                        }
-                                      
-                                </script>                       
+                        <p style="position:absolute; top:20px; right:360px; font-size:13px; width:100px">└── GCODE/<p>
+                        <div id="crud-wrapper" style="">              
+                                <div id="crud"> <ul id="fileList"></ul></div>
                         </div>
-
                      
                         <div id="serialPortName" class="txtInp" style="position:absolute; bottom:10px; left:20px"><span id="portName">N/A</span></div>
-                        <button id="btn-connect" class="btTool" style="position:absolute; bottom:15px; left:150px" onclick="connectPort()">connect</button>
-                        <button id="btn-stop" class="btTool" style="position:absolute; bottom:15px; left:250px" onclick="stopSend()">Stop</button>                  
-                        <button id="btn-send" class="btTool" style="position:absolute; bottom:15px; left:350px" onclick="startSend()" disabled>Invia G-code</button>
-                        <button id="btn-pause-gcode" class="btTool" style="position:absolute; bottom:15px; left:450px" onclick="pauseGCode()" disabled>Pausa</button>
-                        <button id="btn-resume-gcode"class="btTool" style="position:absolute; bottom:15px; left:550px"  onclick="resumeGCode()" disabled>Riprendi</button>
+                        <button id="connect" class="btTool" style="position:absolute; bottom:15px; left:150px">connect</button>
+                        <button id="stop" class="btTool" style="position:absolute; bottom:15px; left:250px" >Stop</button>                  
+                        <button id="send" class="btTool" style="position:absolute; bottom:15px; left:350px" >Invia G-code</button>
+                        <button id="pause" class="btTool" style="position:absolute; bottom:15px; left:450px"  >Pausa</button>
+                        <button id="resume"class="btTool" style="position:absolute; bottom:15px; left:550px"  >Riprendi</button>
 
                         <script>                            
                                 var GCSenderShow = function(){
@@ -1059,7 +1013,7 @@
                                                         engrave(intersectedPaths); contour()
                                                         gcode = pre + gcode + post
                                                 }
-                                                saveGcode(gcode, flName); GCSenderShow()
+                                                saveGCODE(gcode, flName); GCSenderShow()
 
                                         } catch(error){console.error(error.message)}                                
                                 }
@@ -1269,73 +1223,102 @@
                                 }
                                 function roundCoord(coord){return Math.round(coord * 10) / 10}
                                 function convertToMM(value, dpi = 96){var mmPerInch = 25.4; return (value / dpi) * mmPerInch}
+    
+                                indexedDB.deleteDatabase("GCODE_DB")
+                                var db, request = indexedDB.open("GCODE_DB", 1)
 
-                                          
-                                function download(){
-                                        data = gcode
-                                        var _20 = $("#_20").val()
-                                        var blob = new Blob([data], {type: 'text/plain'})
-                                        var link = document.createElement('a')
-                                        link.href = URL.createObjectURL(blob)
-                                        link.download = _20.toString()
-                                        document.body.appendChild(link)
-                                        link.click();console.log(_20.toString())
-                                        document.body.removeChild(link)
-                                }      
-                                function saveGcode(data, fn) {
-                                        fetch('/wrGCODE', {
-                                                method: 'POST',
-                                                headers: {
-                                                        'Content-Type': 'application/json'
-                                                },
-                                                body: JSON.stringify({n: fn, gcode: data})
-                                        })
-                                        .then(response => response.json())
-                                        .then(result => {
-                                                console.log('Upload G-code: ' + result.filename);
-                                                formValidation(result.filename);
-                                        })
-                                        .catch(error => console.error('Error saving G-code:', error));
+                                request.onupgradeneeded = function(event){
+                                        db = event.target.result
+                                        let fileStore = db.createObjectStore("gcode_files", {keyPath: "id", autoIncrement: true})
+                                        fileStore.createIndex("name", "name", {unique: false})
                                 }
 
-
-
-                               /*  try {
-                                        var socket = io();
-                                        socket.on("connect", function () {
-                                                console.log("socket connected, id:", socket.id);
-                                        });
-                                } catch (error){
-                                        console.error("JavaScript error:", error);
+                                request.onsuccess = function(event){
+                                        db = event.target.result; loadFiles();
                                 }
 
-                                function connectPort() {
-                                        socket.emit("connect_port");
-                                        console.log("Tentativo di connessione alla porta seriale...");
-                                }
-                                socket.on("serial_port_status", (data) => {
-                                        const portName = document.getElementById("portName");
-                                        if (data.isOpen) {
-                                                portName.style.color = "green";
-                                                portName.textContent = data.portName ? data.portName : "N/A";
-                                                updateUIOnConnection(true);
-                                        } else {
-                                                portName.textContent = "Porta seriale chiusa";
-                                                portName.style.color = "red";
-                                                updateUIOnConnection(false);
+                                function saveGCODE(data, fn){
+                                        let fileName = fn
+                                        let gcode = data
+                                        if (!fileName || !gcode) return
+
+                                        let blob = new Blob([gcode], {type: "text/plain"})
+
+                                        let transaction = db.transaction("gcode_files", "readwrite")
+                                        let store = transaction.objectStore("gcode_files")
+                                        store.add({ name: fileName, data: blob })
+
+                                        transaction.oncomplete = function() {
+                                                document.getElementById("_10").value = ""
+                                                gcode = ""; loadFiles()
                                         }
-                                });
-
-                                function startSend() {
-                                        socket.emit("start");
-                                        console.log("sent gcode...")
                                 }
-                                function stopSend() {
-                                        socket.emit("stop");
-                                        updateUIOnConnection(false);
-                                        console.log("stopped")
-                                }*/
-                                
+
+                                let gcodeText = ""
+                                function loadFiles() {
+                                        let transaction = db.transaction("gcode_files", "readonly")
+                                        let store = transaction.objectStore("gcode_files")
+                                        let request = store.getAll()
+
+                                        request.onsuccess = function() {
+                                                let fileList = document.getElementById("fileList")
+                                                fileList.innerHTML = ""
+
+                                                request.result.forEach(file => {
+                                                        let li = document.createElement("li")
+                                                        li.textContent = "├── "+file.name
+
+                                                        let buttonContainer = document.createElement("div")
+                                                        buttonContainer.classList.add("button-container")
+
+                                                        let downloadBtn = document.createElement("button")
+                                                        downloadBtn.textContent = "Scarica"
+                                                        downloadBtn.classList.add("btTool")
+                                                        downloadBtn.onclick = function() {downloadFile(file)}
+
+                                                        let deleteBtn = document.createElement("button")
+                                                        deleteBtn.textContent = "Elimina"
+                                                        deleteBtn.classList.add("btTool")
+                                                        deleteBtn.onclick = function() {deleteFile(file.id)}
+
+                                                        let dBtn = document.createElement("button")
+                                                        dBtn.textContent = "set"
+                                                        dBtn.classList.add("btTool")
+                                                        dBtn.onclick = function() { 
+                                                                let reader = new FileReader()
+                                                                reader.onload = function(e){
+                                                                        gcodeText = e.target.result
+                                                                        calculateBounds(gcodeText)
+                                                                        gcVIEW(gcodeText)
+                                                                }; reader.readAsText(file.data)
+                                                        }           
+
+                                                        buttonContainer.appendChild(dBtn)
+                                                        buttonContainer.appendChild(downloadBtn)
+                                                        buttonContainer.appendChild(deleteBtn)
+
+                                                        li.appendChild(buttonContainer)
+                                                        fileList.appendChild(li)
+                                                })
+                                        }
+                                }
+
+                                function downloadFile(file){
+                                        let url = URL.createObjectURL(file.data)
+                                        let a = document.createElement("a")
+                                        a.href = url
+                                        a.download = file.name + ".gcode"
+                                        document.body.appendChild(a)
+                                        a.click(); document.body.removeChild(a)
+                                }
+
+                                function deleteFile(id) {
+                                        let transaction = db.transaction("gcode_files", "readwrite")
+                                        let store = transaction.objectStore("gcode_files")
+                                        store.delete(id)
+                                        transaction.oncomplete = function(){loadFiles()}
+                                }
+
                                 var GCH = $('#crud-cont').height()
                                 var rawGcode = ""
                                 var sentGCodeLines = 0
@@ -1352,15 +1335,6 @@
                                                 var percentage = (sentGCodeLines / totalGCodeLines) * 100;
                                                 progressBar.style.width = percentage + "%";
                                         }
-                                }
-
-                                function updateUIOnConnection(isConnected) {
-                                        grblConnected = isConnected;
-                                        document.getElementById("btn-send").disabled = !isConnected;
-                                        $("#btn-pause-gcode").prop("disabled", !isConnected);
-                                        $("#btn-resume-gcode").prop("disabled", !isConnected);
-                                        $("#btn-connect").prop("disabled", isConnected);
-                                        console.log(isConnected ? "operations enabled" : "operations disabled");
                                 }
 
                                 var maxLogLines = 20, logBuffer = [];  
@@ -1388,170 +1362,281 @@
                                                 }
                                         }; requestAnimationFrame(step);
                                 }
-                                /*socket.on("cnc_response", (data) => {
-                                        // **Avoid overfilling the DOM log**
-                                        if (data.line === lastLogEntry) {
-                                                return;
-                                        }
-                                        lastLogEntry = data.line;
-                                        if (logBuffer.length > maxLogLines) {
-                                                logBuffer.shift()
-                                        }
 
-                                        logBuffer.push(`<p>${data.line}</p>`);
-                                        log.innerHTML = logBuffer.join("");
-                                        log.scrollTop = log.scrollHeight;
-
-                                        // **Parsing coordinates**
-                                        var xMatch = data.line.match(/X([-+]?[0-9]*\.?[0-9]+)/);
-                                        var yMatch = data.line.match(/Y([-+]?[0-9]*\.?[0-9]+)/);
-                                        
-                                        if (xMatch && yMatch) {
-                                                var xValue = parseFloat(xMatch[1]);
-                                                var yValue = parseFloat(yMatch[1]);
-                                                var xCanvas = xValue * scaleFactor + offsetX;
-                                                var yCanvas = canvasGC.height - (yValue * scaleFactor + offsetY);
-                                                if (data.line.startsWith("G1")) {
-                                                        if (!lastPos) {
-                                                                lastPos = { x: xCanvas, y: yCanvas };
-                                                        } else {
-                                                                drawLine(lastPos.x, lastPos.y, xCanvas, yCanvas, 200)
-                                                                lastPos = { x: xCanvas, y: yCanvas };
-                                                        }
-                                                } else {
-                                                        lastPos = { x: xCanvas, y: yCanvas };
-                                                }                               
-                                        }
-                                });
-
-                                socket.on("progress", (data) => {
-                                        sentGCodeLines++;
-                                        updateProgressBar();
-                                });
-
-                                socket.on("cnc_done", (data) => {
-                                        sentGCodeLines = totalGCodeLines;
-                                        updateProgressBar();
-                                });
-
-                                socket.on("response", (data) => {
-                                        console.log(data.message);
-                                });   
-
-                                socket.on("error", (data) => {
-                                        console.log("Errore: " + data.message);
-                                });
-
-                                function pauseGCode() {
-                                        socket.emit("pause");
-                                        socket.once("pause", (data) => { console.log(data.message); });
-                                }
-
-                                function resumeGCode() {
-                                        socket.emit("resume");
-                                        socket.once("resume", (data) => { console.log(data.message); });
-                                }*/
 
                                 var canvasGC = document.getElementById('preview');
                                 var contextGC = canvasGC.getContext("2d");
                                 canvasGC.width = GCH - 80
                                 canvasGC.height = GCH - 80                                     
                                 var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-                                var scaleFactor = 1;
-                                var offsetX = 0, offsetY = 0;
-                                var vectorMode = false;
-                                var constantS = null;
+                                var scaleFactor = 1
+                                var offsetX = 0, offsetY = 0
+                                var vectorMode = false
+                                var constantS = null
 
                                 function calculateBounds(gcodeContent) {
                                         var lines = gcodeContent.split('\n');
-                                        minX = minY = Infinity;
-                                        maxX = maxY = -Infinity;
-                                        let sValues = new Set();
+                                        minX = minY = Infinity
+                                        maxX = maxY = -Infinity
+                                        let sValues = new Set()
                                         lines.forEach(line => {
-                                                var codes = line.trim().split(' ');
-                                                var xVal = codes.find(c => c.startsWith('X'));
-                                                var yVal = codes.find(c => c.startsWith('Y'));
-                                                var sVal = codes.find(c => c.startsWith('S'));
-                                                if ((codes[0] === 'G0' || codes[0] === 'G1') && sVal) {
-                                                        let power = parseInt(sVal.replace('S', ''));
-                                                        sValues.add(power);
+                                                var codes = line.trim().split(' ')
+                                                var xVal = codes.find(c => c.startsWith('X'))
+                                                var yVal = codes.find(c => c.startsWith('Y'))
+                                                var sVal = codes.find(c => c.startsWith('S'))
+                                                if ((codes[0] === 'G0' || codes[0] === 'G1') && sVal){
+                                                        let power = parseInt(sVal.replace('S', ''))
+                                                        sValues.add(power)
                                                 }
                                                 if (xVal && yVal) {
-                                                        var x = parseFloat(xVal.replace('X', ''));
-                                                        var y = parseFloat(yVal.replace('Y', ''));
-                                                        if (!isNaN(x) && !isNaN(y)) {
-                                                                minX = Math.min(minX, x);
-                                                                minY = Math.min(minY, y);
-                                                                maxX = Math.max(maxX, x);
-                                                                maxY = Math.max(maxY, y);
+                                                        var x = parseFloat(xVal.replace('X', ''))
+                                                        var y = parseFloat(yVal.replace('Y', ''))
+                                                        if (!isNaN(x) && !isNaN(y)){
+                                                                minX = Math.min(minX, x)
+                                                                minY = Math.min(minY, y)
+                                                                maxX = Math.max(maxX, x)
+                                                                maxY = Math.max(maxY, y)
                                                         }
                                                 }
                                         });
                                         if (sValues.size === 1) {
                                                 vectorMode = true;
-                                                constantS = [...sValues][0];
+                                                constantS = [...sValues][0]
                                         } else {
-                                                vectorMode = false;
+                                                vectorMode = false
                                         }
-                                        var width = maxX - minX;
-                                        var height = maxY - minY;
-                                        var scaleX = (canvasGC.width - 20) / width;
-                                        var scaleY = (canvasGC.height - 20) / height;
-                                        scaleFactor = Math.min(scaleX, scaleY);
-                                        offsetX = (canvasGC.width - width * scaleFactor) / 2 - minX * scaleFactor;
-                                        offsetY = (canvasGC.height - height * scaleFactor) / 2 - minY * scaleFactor;
+                                        var width = maxX - minX
+                                        var height = maxY - minY
+                                        var scaleX = (canvasGC.width - 20) / width
+                                        var scaleY = (canvasGC.height - 20) / height
+                                        scaleFactor = Math.min(scaleX, scaleY)
+                                        offsetX = (canvasGC.width - width * scaleFactor) / 2 - minX * scaleFactor
+                                        offsetY = (canvasGC.height - height * scaleFactor) / 2 - minY * scaleFactor
                                 }
 
                                 function gcVIEW(gcodeContent) {
-                                        contextGC.clearRect(0, 0, canvasGC.width, canvasGC.height);
-                                        var lines = gcodeContent.split('\n');
-                                        var gindex = 0;
-                                        let prevX = null, prevY = null;
+                                        contextGC.clearRect(0, 0, canvasGC.width, canvasGC.height)
+                                        var lines = gcodeContent.split('\n')
+                                        var gindex = 0
+                                        let prevX = null, prevY = null
 
                                         function render() {
-                                                for (var i = gindex; i < lines.length; i++) {
-                                                        var codes = lines[i].trim().split(' ');
-                                                        var isG0 = codes[0] === 'G0';
-                                                        var isG1 = codes[0] === 'G1';
+                                                for (var i = gindex; i < lines.length; i++){
+                                                        var codes = lines[i].trim().split(' ')
+                                                        var isG0 = codes[0] === 'G0'
+                                                        var isG1 = codes[0] === 'G1'
 
-                                                        if (isG0 || isG1) {
-                                                                var xVal = codes.find(c => c.startsWith('X'));
-                                                                var yVal = codes.find(c => c.startsWith('Y'));
-                                                                var sVal = codes.find(c => c.startsWith('S'));
-                                                                var power = sVal ? parseInt(sVal.replace('S', '')) : 0;
-                                                                var gray;
+                                                        if (isG0 || isG1){
+                                                                var xVal = codes.find(c => c.startsWith('X'))
+                                                                var yVal = codes.find(c => c.startsWith('Y'))
+                                                                var sVal = codes.find(c => c.startsWith('S'))
+                                                                var power = sVal ? parseInt(sVal.replace('S', '')) : 0
+                                                                var gray
 
                                                                 if (isG1) {
-                                                                        if (vectorMode) {
+                                                                        if (vectorMode){
                                                                                 gray = Math.round((power / constantS) * 255);
                                                                         } else {
                                                                                 gray = 255 - Math.round((power / 1000) * 255);
                                                                         }
                                                                 }
 
-                                                                if (xVal && yVal) {
-                                                                        var x = parseFloat(xVal.replace('X', '')) * scaleFactor + offsetX;
-                                                                        var y = canvasGC.height - (parseFloat(yVal.replace('Y', '')) * scaleFactor + offsetY);
+                                                                if (xVal && yVal){
+                                                                        var x = parseFloat(xVal.replace('X', '')) * scaleFactor + offsetX
+                                                                        var y = canvasGC.height - (parseFloat(yVal.replace('Y', '')) * scaleFactor + offsetY)
 
-                                                                        if (prevX !== null && prevY !== null) {
+                                                                        if (prevX !== null && prevY !== null){
                                                                                 contextGC.beginPath();
-                                                                                contextGC.strokeStyle = isG1 ? `rgb(${gray}, ${gray}, ${gray})` : "#000";
-                                                                                contextGC.moveTo(prevX, prevY);
-                                                                                contextGC.lineTo(x, y);
-                                                                                contextGC.stroke();
+                                                                                contextGC.strokeStyle = isG1 ? `rgb(${gray}, ${gray}, ${gray})` : "#000"
+                                                                                contextGC.moveTo(prevX, prevY)
+                                                                                contextGC.lineTo(x, y)
+                                                                                contextGC.stroke()
                                                                         }
-
-                                                                        prevX = x;
-                                                                        prevY = y;
+                                                                        prevX = x; prevY = y
                                                                 }
                                                         }
                                                 }
-                                        }; render();
+                                        }; render()
                                 }
+
+
+let port;
+let writer;
+let currentIndex = 0;
+let isPaused = false;
+let stopRequested = false;
+let isSending = false;
+let lastReceivedLine = "";
+const MAX_RETRIES = 2;
+const RETRY_DELAY = 100;
+
+document.getElementById('connect').addEventListener('click', async () => {
+    try {
+        port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 115200 });
+        writer = port.writable.getWriter();
+        reader = port.readable.getReader();
+        logMessage("✅ Connesso al dispositivo.");
+        readSerialData();
+    } catch (err) {
+        logMessage("❌ Errore connessione: " + err);
+    }
+});
+
+document.getElementById('send').addEventListener('click', async () => {
+    if (port && gcodeText.trim()) {
+        currentIndex = 0;
+        isPaused = false;
+        stopRequested = false;
+        isSending = true;
+        sendNextLine();
+    } else {
+        logMessage("⚠️ Connetti il dispositivo e carica il G-Code prima di inviare.");
+    }
+});
+
+document.getElementById('pause').addEventListener('click', () => {
+    isPaused = true;
+    logMessage("⏸️ Trasmissione in pausa.");
+});
+
+document.getElementById('resume').addEventListener('click', () => {
+    if (isPaused) {
+        isPaused = false;
+        logMessage("▶️ Ripresa trasmissione...");
+        sendNextLine();
+    }
+});
+
+document.getElementById('stop').addEventListener('click', async () => {
+    stopRequested = true;
+    isSending = false;
+    logMessage("🛑 Trasmissione interrotta.");
+    if (port) {
+        await reader.cancel();
+        reader.releaseLock();
+        writer.releaseLock();
+        await port.close();
+        port = null;
+        logMessage("🔌 Connessione chiusa.");
+    }
+});
+
+async function sendNextLine() {
+    if (stopRequested || isPaused || !isSending) return;
+
+    const lines = gcodeText.split('\n');
+
+    // Imposta il numero totale di righe se non è stato già fatto
+    if (totalGCodeLines === 0) {
+        totalGCodeLines = lines.length;
+    }
+
+    if (currentIndex < lines.length) {
+        const line = lines[currentIndex].trim();
+        currentIndex++; // Assicurarsi che l'indice avanzi sempre
+
+        if (line && !line.startsWith(';')) {
+            await sendCommand(line + "\n");
+            logMessage("↑ " + line);
+            await waitResponse(line, 0);
+        }
+
+        sentGCodeLines++;
+        updateProgressBar();
+
+        // Prossima riga
+        setTimeout(sendNextLine, 10); // Piccola attesa per evitare blocchi
+    } else {
+        isSending = false;
+        logMessage("✅ Trasmissione completata.");
+        sentGCodeLines = totalGCodeLines;
+        updateProgressBar();
+    }
+}
+
+// Funzione per iniziare l'invio
+function startSending(gcode) {
+    if (isSending) return;
+    gcodeText = gcode;
+    currentIndex = 0;
+    sentGCodeLines = 0;
+    totalGCodeLines = gcodeText.split('\n').length;
+    isSending = true;
+    updateProgressBar();
+    sendNextLine();
+}
+
+
+async function sendCommand(command) {
+    if (port && writer) {
+        await writer.write(new TextEncoder().encode(command));
+    }
+}
+
+async function waitResponse(line, attempts = 0) {
+    if (attempts >= MAX_RETRIES) {
+        logMessage(`⚠️ Timeout: Nessuna risposta 'OK' dopo ${MAX_RETRIES} tentativi.`);
+        return;
+    }
+    try {
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+
+        if (lastReceivedLine.trim().toLowerCase() === "ok") {
+            console.log(`↓ 'OK' per: ${line}`);
+            currentIndex++;
+            sendNextLine();
+        } else if (lastReceivedLine.toLowerCase().startsWith("error:")) {
+            logMessage(`❌ Errore ricevuto da GRBL: ${lastReceivedLine}`);
+        } else {
+            logMessage(`Risposta non valida: ${lastReceivedLine}`);
+        }
+    } catch (error) {
+        logMessage(`❌ Errore nella gestione della risposta: ${error.message}`);
+    }
+}
+
+async function readSerialData() {
+    let buffer = "";
+    try {
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buffer += new TextDecoder().decode(value);
+            const lines = buffer.split("\n");
+            buffer = lines.pop();
+            for (const line of lines) {
+                const trimmedLine = line.trim();
+                if (trimmedLine) {
+                    lastReceivedLine = trimmedLine;
+                }
+            }
+        }
+    } catch (error) {
+        logMessage("⚠️ Errore lettura seriale: " + error);
+    } finally {
+        reader.releaseLock();
+    }
+}
+
+
+
+        function logMessage(msg){
+            if (logBuffer.length > maxLogLines) {
+                logBuffer.shift();
+            }
+            logBuffer.push(`<p>${msg}</p>`);
+            log.innerHTML = logBuffer.join("");
+            log.scrollTop = log.scrollHeight;
+        }
+                                
                         </script>
                 </div>        
         </body>             
 </html>            
 
 
-<!-- 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 -->
+
+<!-- 
+-->
+
