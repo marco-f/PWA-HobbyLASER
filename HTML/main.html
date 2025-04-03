@@ -1224,7 +1224,7 @@ module(15, 20, 4).gcode()
                                 function roundCoord(coord){return Math.round(coord * 10) / 10}
                                 function convertToMM(value, dpi = 96){var mmPerInch = 25.4; return (value / dpi) * mmPerInch}
     
-                                indexedDB.deleteDatabase("GCODE_DB")
+                                //indexedDB.deleteDatabase("GCODE_DB")
                                 var db, request = indexedDB.open("GCODE_DB", 1)
 
                                 request.onupgradeneeded = function(event){
