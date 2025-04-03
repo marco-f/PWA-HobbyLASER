@@ -1240,20 +1240,7 @@ module(15, 20, 4).gcode()
 
                                 function saveGCODE(data, fn){
                                         console.log('save')
-                                        let fileName = fn
-                                        let gcode = data
-                                        if (!fileName || !gcode) return
 
-                                        let blob = new Blob([gcode], {type: "text/plain"})
-
-                                        let transaction = db.transaction("gcode_files", "readwrite")
-                                        let store = transaction.objectStore("gcode_files")
-                                        store.add({ name: fileName, data: blob })
-
-                                        transaction.oncomplete = function() {
-                                                document.getElementById("_10").value = ""
-                                                gcode = ""; loadFiles()
-                                        }
                                 }
 
                                 let gcodeText = ""
