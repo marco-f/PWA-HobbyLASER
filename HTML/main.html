@@ -1225,21 +1225,21 @@ module(15, 20, 4).gcode()
                                 function convertToMM(value, dpi = 96){var mmPerInch = 25.4; return (value / dpi) * mmPerInch}
     
                                 //indexedDB.deleteDatabase("GCODE_DB")
-let testDB = indexedDB.open("TestDB", 1);
+                                indexedDB.deleteDatabase("GCODE_DB")
+                                var db, request = indexedDB.open("GCODE_DB", 1)
 
-testDB.onupgradeneeded = function (event) {
-    console.log("onupgradeneeded chiamato per TestDB");
-};
+                                request.onupgradeneeded = function(event){
+                                        db = event.target.result
+                                        let fileStore = db.createObjectStore("gcode_files", {keyPath: "id", autoIncrement: true})
+                                        fileStore.createIndex("name", "name", {unique: false})
+                                }
 
-testDB.onsuccess = function (event) {
-    console.log("Database TestDB aperto con successo:", event.target.result);
-};
-
-testDB.onerror = function (event) {
-    console.error("Errore nell'apertura di TestDB:", event.target.error);
-};
+                                request.onsuccess = function(event){
+                                        db = event.target.result; loadFiles();
+                                }
 
                                 function saveGCODE(data, fn){
+                                        console.log('save')
                                         let fileName = fn
                                         let gcode = data
                                         if (!fileName || !gcode) return
