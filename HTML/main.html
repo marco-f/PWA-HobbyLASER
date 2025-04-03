@@ -1256,6 +1256,7 @@ module(15, 20, 4).gcode()
 
                                 let gcodeText = ""
                                 function loadFiles() {
+                                        console.log('ok')
                                         let transaction = db.transaction("gcode_files", "readonly")
                                         let store = transaction.objectStore("gcode_files")
                                         let request = store.getAll()
