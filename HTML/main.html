@@ -1227,15 +1227,21 @@ module(15, 20, 4).gcode()
                                 //indexedDB.deleteDatabase("GCODE_DB")
                                 var db, request = indexedDB.open("GCODE_DB", 1)
 
-                                request.onupgradeneeded = function(event){
-                                        db = event.target.result
-                                        let fileStore = db.createObjectStore("gcode_files", {keyPath: "id", autoIncrement: true})
-                                        fileStore.createIndex("name", "name", {unique: false})
-                                }
+request.onupgradeneeded = function (event) {
+    console.log("onupgradeneeded chiamato");
+    db = event.target.result;
+    let fileStore = db.createObjectStore("gcode_files", { keyPath: "id", autoIncrement: true });
+    fileStore.createIndex("name", "name", { unique: false });
+};
 
-                                request.onsuccess = function(event){
-                                        db = event.target.result; loadFiles();
-                                }
+request.onsuccess = function (event) {
+    db = event.target.result;
+    console.log("Database aperto con successo:", db);
+    loadFiles();
+};
+request.onerror = function (event) {
+    console.error("Errore nell'apertura del database:", event.target.error);
+};
 
                                 function saveGCODE(data, fn){
                                         let fileName = fn
