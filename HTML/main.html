@@ -1245,7 +1245,7 @@ module(15, 20, 4).gcode()
                                         if (!fileName || !gcode) return
 
                                         let blob = new Blob([gcode], {type: "text/plain"})
-
+console.log(blob)
                                         let transaction = db.transaction("gcode_files", "readwrite")
                                         let store = transaction.objectStore("gcode_files")
                                         store.add({ name: fileName, data: blob })
