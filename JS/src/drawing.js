@@ -312,7 +312,7 @@ var updateMousePosition = (e, {down = false, up = false} = {}) =>{
                 mouse.right.down = false
                 mouse.right.from.x = null
                 mouse.right.from.y = null
-                //setTimeout(() => {bV = false; addPOLYLINE()}, 500)/*----------------------------------------------------------------------------------------*/
+                setTimeout(() => {bV = false; addPOLYLINE()}, 500)/*----------------------------------------------------------------------------------------*/
         }
 }
 
