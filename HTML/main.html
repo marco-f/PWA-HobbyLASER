@@ -430,7 +430,7 @@
         }
         return use(paths);
 }
-module(15, 20, 4).gcode()
+POLYLINE('M 5 5 L 50 5 L 50 50 L 5 50 L 5 5 Z').gcode()
 `);
                                         editor.clearSelection();
                                         editor.moveCursorTo(0, 0);
@@ -693,41 +693,41 @@ module(15, 20, 4).gcode()
                         </div>
                                           
                         <div id="t_1" class="buttons-container" style="top:120px">
-                                <span class="txtInp" style="border:0; cursor:default; width:70px">min POWER(%)</span>
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:70px">min POWER(%)</span>
                                 <input class="txtInp" type="text" id="_02" placeholder="set power" maxlength="4" value="0"/>
 
-                                <span class="txtInp" style="border:0; cursor:default; width:50px;">max POWER(%)</span>
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px;">max POWER(%)</span>
                                 <input class="txtInp" type="text" id="_03" placeholder="set power" maxlength="4" value="1000"/>
 
-                                <span class="txtInp" style="border:0; cursor:default; width:50px">speed TRAVEL</span>
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px">speed TRAVEL</span>
                                 <input class="txtInp" type="text" id="_04" placeholder="radius" maxlength="4" value="1000"/>
 
-                                <span class="txtInp" style="border:0; cursor:default; width:50px;">speed LASER</span>
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px;">speed LASER</span>
                                 <input class="txtInp" type="text" id="_05" placeholder="radius" maxlength="4" value="600"/>
                                           
-                                <span class="txtInp" style="border:0; cursor:default; width:50px">n° PASS.</span>
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px">n° PASS.</span>
                                 <input class="txtInp" type="text" id="_06" placeholder="n° passes" value="1"/>
                         </div>
                         <div id="t_2" class="buttons-container" style="top:160px">
-                                <span class="txtInp" style="border:0; cursor:default; width:70px">rowsPerMM</span>
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:70px">rowsPerMM</span>
                                 <input class="txtInp" type="text" id="_07" placeholder="rows/mm" maxlength="4" value="3"/>
 
-                                <span class="txtInp" style="border:0; cursor:default; width:50px">Z-AXIS</span>
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px">Z-AXIS</span>
                                 <input class="txtInp" type="text" id="_08" placeholder="inc. Z" maxlength="4" value="0"/>
 
-                                <span class="txtInp" style="border:0; cursor:default; width:50px">&nbsp;air&nbsp;
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px">&nbsp;air&nbsp;
                                 ASSIST</span><input class="txtInp" type="text" id="_09" placeholder="set air" maxlength="4" value="0"/>
                                
-                                <span class="txtInp" style="border:0; cursor:default; width:50px">fileNAME</span>
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px">fileNAME</span>
                                 <input class="txtInp" type="text" id="_10" placeholder="set name" value="a"/>
 
-                                <span class="txtInp" style="border:0; cursor:default; width:50px">toGCODE</span>
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px">toGCODE</span>
                                 <button class="btTool" onclick="obj2gc()">create</button>     
                         </div>
                         <div id="t_3" class="buttons-container" style="top:210px; width:100%">
                                 <div id="d_1" style="width:auto; height:auto; margin:0 auto; position:relative">
-                                        <span class="txtInp" style="border:0; cursor:default;">download</span>
-                                        <button class="btTool" onclick="">OK</button>                      
+                                        <span class="txtInp" style="background:transparent; border:0; cursor:default;">download</span>
+                                        <button class="btTool" onclick="download()">OK</button>                      
                                </div>                     
                         </div>                                  
 
@@ -774,21 +774,18 @@ module(15, 20, 4).gcode()
                         </div>                
 
                         <div id="log-cont" style="position:absolute; left:0px; height:calc(100% - 80px); width:290px; top:20px"> 
-                                <div id="log" style="padding-left:10px"></div>
-                        </div>              
+                                <div id="log" style="padding-left:10px; line-height:1.5"></div>
+                        </div>
+
+                  
+                        <p style="position:absolute; top:0px; right:460px; font-size:13px">OUTPUT/<p>
+                        <p class="btImg" style="top:0px; right:15px; font-size:10px; width:20px" onclick='GCSenderHide()'>X<p>                        
 
                         <!-- Canvas per la preview statica -->
                         <canvas id="preview" style="position:absolute; left:300px; top:20px; z-index:1; border: 1px solid #ccc"></canvas>
-                  
-                        <p style="position:absolute; top:0px; right:460px; font-size:13px">OUTPUT/<p>
-                        <p class="btImg" style="top:0px; right:15px; font-size:10px; width:20px" onclick='GCSenderHide()'>X<p>
-                                      
-                        <p style="position:absolute; top:20px; right:360px; font-size:13px; width:100px">└── GCODE/<p>
-                                     
-                                <div id="crud"> <ul id="fileList"></ul></div>
-                       
+
                      
-                        <div id="serialPortName" class="txtInp" style="position:absolute; bottom:10px; left:20px"><span id="portName">N/A</span></div>
+                        <div id="serial" class="txtInp" style="position:absolute; bottom:10px; left:20px"><span id="portName">N/A</span></div>
                         <button id="connect" class="btTool" style="position:absolute; bottom:15px; left:150px">connect</button>
                         <button id="stop" class="btTool" style="position:absolute; bottom:15px; left:250px" >Stop</button>                  
                         <button id="send" class="btTool" style="position:absolute; bottom:15px; left:350px" >Invia G-code</button>
@@ -840,18 +837,18 @@ module(15, 20, 4).gcode()
                                                     if (path.length > 0) {
                                                         // Sposta senza disegnare al punto iniziale
                                                         let startPoint = path[0];
-                                                        gcode += `G0 X${startPoint.X.toFixed(2)} Y${(dHeight + 6 - startPoint.Y).toFixed(2)} F${speedTRVL};\n`;
+                                                        gcode += `G0 X${startPoint.X.toFixed(2)} Y${(dHeight + 6 - startPoint.Y).toFixed(2)}\n`;
                                                         
                                                         // Pausa per stabilizzazione
-                                                        gcode += `G4 P${pause}; Pausa per stabilizzazione;\n`;
+                                                        gcode += `P${pause}; Pausa per stabilizzazione;\n`;
                                                         
                                                         // Abbassa la penna
                                                         gcode += `M3;\n`;
 
                                                         // Traccia il percorso
                                                         path.forEach((point, index) => {
-                                                            if (index > 0) { // Evita di ripetere il primo punto
-                                                                gcode += `G1 X${point.X.toFixed(2)} Y${(dHeight + 6 - point.Y).toFixed(2)} F${speedLSR};\n`;
+                                                            if (index > 0) { // Evita di ripetere il primo punto           
+                                                                gcode += `G1 X${point.X.toFixed(2)} Y${(dHeight + 6 - point.Y).toFixed(2)}\n`;
                                                             }
                                                         });
 
@@ -1005,7 +1002,8 @@ module(15, 20, 4).gcode()
                                                 
                                                 if (md == 0){
                                                         contour()
-                                                        gcode = pre + gcode + post
+                                                        //gcode = pre + gcode + post
+                                                        gcode = gcode
                                                 }
                                                 else {
                                                         const lines = infillLines([bounds.minX, bounds.minY, bounds.maxX, bounds.maxY])
@@ -1013,7 +1011,7 @@ module(15, 20, 4).gcode()
                                                         engrave(intersectedPaths); contour()
                                                         gcode = pre + gcode + post
                                                 }
-                                                saveGCODE(gcode, flName); GCSenderShow()
+                                                sendGCODE(gcode); GCSenderShow()
 
                                         } catch(error){console.error(error.message)}                                
                                 }
@@ -1223,103 +1221,34 @@ module(15, 20, 4).gcode()
                                 }
                                 function roundCoord(coord){return Math.round(coord * 10) / 10}
                                 function convertToMM(value, dpi = 96){var mmPerInch = 25.4; return (value / dpi) * mmPerInch}
-    
-                                //indexedDB.deleteDatabase("GCODE_DB")
-                                indexedDB.deleteDatabase("GCODE_DB")
-                                var db, request = indexedDB.open("GCODE_DB", 1)
 
-                                request.onupgradeneeded = function(event){
-                                        db = event.target.result
-                                        let fileStore = db.createObjectStore("gcode_files", {keyPath: "id", autoIncrement: true})
-                                        fileStore.createIndex("name", "name", {unique: false})
-                                }
-
-                                request.onsuccess = function(event){
-                                        db = event.target.result; loadFiles();
-                                }
-
-                                function saveGCODE(data, flName){
-                                        console.log('save', flName)
-                                        let fileName = flName
-                                        let gcode = data
-                                        if (!fileName || !gcode) return
-gcodeText = data
-                                        let blob = new Blob([gcode], {type: "text/plain"})
-                                        let transaction = db.transaction("gcode_files", "readwrite")
-                                        let store = transaction.objectStore("gcode_files")
-                                        store.add({ name: fileName, data: blob })
-
-                                        transaction.oncomplete = function() {
-                                                document.getElementById("_10").value = ""
-                                                gcode = ""; loadFiles()
+                                function download(){
+                                        if (typeof gcode === "undefined") {
+                                                console.error("error: gcode undefined"); return
                                         }
-                                }
 
-                                let gcodeText = ""
-                                function loadFiles() {
-                                        console.log('ok')
-                                        let transaction = db.transaction("gcode_files", "readonly")
-                                        let store = transaction.objectStore("gcode_files")
-                                        let request = store.getAll()
-
-                                        request.onsuccess = function() {
-                                                let fileList = document.getElementById("fileList")
-                                                fileList.innerHTML = ""
-
-                                                request.result.forEach(file => {
-                                                        let li = document.createElement("li")
-                                                        li.textContent = "├── "+file.name
-
-                                                        let buttonContainer = document.createElement("div")
-                                                        buttonContainer.classList.add("button-container")
-
-                                                        let downloadBtn = document.createElement("button")
-                                                        downloadBtn.textContent = "Scarica"
-                                                        downloadBtn.classList.add("btTool")
-                                                        downloadBtn.onclick = function() {downloadFile(file)}
-
-                                                        let deleteBtn = document.createElement("button")
-                                                        deleteBtn.textContent = "Elimina"
-                                                        deleteBtn.classList.add("btTool")
-                                                        deleteBtn.onclick = function() {deleteFile(file.id)}
-
-                                                        let dBtn = document.createElement("button")
-                                                        dBtn.textContent = "set"
-                                                        dBtn.classList.add("btTool")
-                                                        dBtn.onclick = function() { 
-                                                                let reader = new FileReader()
-                                                                reader.onload = function(e){
-                                                                        gcodeText = e.target.result
-                                                                        calculateBounds(gcodeText)
-                                                                        gcVIEW(gcodeText)
-                                                                }; reader.readAsText(file.data)
-                                                        }           
-
-                                                        buttonContainer.appendChild(dBtn)
-                                                        buttonContainer.appendChild(downloadBtn)
-                                                        buttonContainer.appendChild(deleteBtn)
-
-                                                        li.appendChild(buttonContainer)
-                                                        fileList.appendChild(li)
-                                                })
+                                        var fileName = $("#_10").val() || "download"
+                                        if (!fileName.endsWith(".gcode")) {
+                                                fileName += ".gcode"
                                         }
-                                }
 
-                                function downloadFile(file){
-                                        let url = URL.createObjectURL(file.data)
-                                        let a = document.createElement("a")
-                                        a.href = url
-                                        a.download = file.name + ".gcode"
-                                        document.body.appendChild(a)
-                                        a.click(); document.body.removeChild(a)
+                                        var blob = new Blob([gcode], { type: "text/plain" })
+                                        var link = document.createElement("a")
+                                        link.href = URL.createObjectURL(blob)
+                                        link.download = fileName
+                                        document.body.appendChild(link)
+                                        link.click(); document.body.removeChild(link)
                                 }
+                                var gcodeText = ""
+                                function sendGCODE(data){
+                                        //download()
+                                        document.getElementById("_10").value = ""
+                                        gcodeText = data; gcode = ""
+                                        calculateBounds(gcodeText)
+                                        gcVIEW(gcodeText)                       
+                                }                                
 
-                                function deleteFile(id) {
-                                        let transaction = db.transaction("gcode_files", "readwrite")
-                                        let store = transaction.objectStore("gcode_files")
-                                        store.delete(id)
-                                        transaction.oncomplete = function(){loadFiles()}
-                                }
+
 
                                 var GCH = $('#crud-cont').height()
                                 var rawGcode = ""
@@ -1475,9 +1404,15 @@ const RETRY_DELAY = 100;
 document.getElementById('connect').addEventListener('click', async () => {
     try {
         port = await navigator.serial.requestPort();
+        const info = port.getInfo(); // Ottiene i dettagli hardware (VID, PID)
+
         await port.open({ baudRate: 115200 });
         writer = port.writable.getWriter();
         reader = port.readable.getReader();
+
+        // Mostra le informazioni della porta
+        $("#portName").text(`VID ${info.usbVendorId || "N/A"}, PID ${info.usbProductId || "N/A"}`);
+
         logMessage("✅ Connesso al dispositivo.");
         readSerialData();
     } catch (err) {
@@ -1524,72 +1459,71 @@ document.getElementById('stop').addEventListener('click', async () => {
     }
 });
 
-async function sendNextLine() {
-    if (stopRequested || isPaused || !isSending) return;
-
-    const lines = gcodeText.split('\n');
-
-    // Imposta il numero totale di righe se non è stato già fatto
-    if (totalGCodeLines === 0) {
-        totalGCodeLines = lines.length;
-    }
-
-    if (currentIndex < lines.length) {
-        const line = lines[currentIndex].trim();
-        currentIndex++; // Assicurarsi che l'indice avanzi sempre
-
-        if (line && !line.startsWith(';')) {
-            await sendCommand(line + "\n");
-            logMessage("↑ " + line);
-            await waitResponse(line, 0);
+        async function sendNextLine() {
+            if (stopRequested || isPaused) return;
+            
+            const lines = gcodeText.split('\n');
+            if (currentIndex < lines.length) {
+                const line = lines[currentIndex].trim();
+                if (line && !line.startsWith(';')) {
+                    await sendCommand(line + "\n");
+                    //logMessage("📤 Inviato: " + line);
+                    await waitResponse(line, 0);
+                } else {
+                    currentIndex++;
+                    sendNextLine();
+                }
+            } else {
+                isSending = false;
+                logMessage("✅ Trasmissione completata.");
+            }
         }
 
-        sentGCodeLines++;
-        updateProgressBar();
-
-        // Prossima riga
-        setTimeout(sendNextLine, 10); // Piccola attesa per evitare blocchi
-    } else {
-        isSending = false;
-        logMessage("✅ Trasmissione completata.");
-        sentGCodeLines = totalGCodeLines;
-        updateProgressBar();
-    }
-}
-
-// Funzione per iniziare l'invio
-function startSending(gcode) {
-    if (isSending) return;
-    gcodeText = gcode;
-    currentIndex = 0;
-    sentGCodeLines = 0;
-    totalGCodeLines = gcodeText.split('\n').length;
-    isSending = true;
-    updateProgressBar();
-    sendNextLine();
-}
-
-
-async function sendCommand(command) {
-    if (port && writer) {
-        await writer.write(new TextEncoder().encode(command));
-    }
-}
+        async function sendCommand(command) {
+            if (port && writer) {
+                await writer.write(new TextEncoder().encode(command));
+            }
+        }
 
 async function waitResponse(line, attempts = 0) {
-    if (attempts >= MAX_RETRIES) {
+        if (attempts >= MAX_RETRIES) {
         logMessage(`⚠️ Timeout: Nessuna risposta 'OK' dopo ${MAX_RETRIES} tentativi.`);
         return;
     }
+
     try {
+        // Aspetta un po' prima di riprovare
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
 
-        if (lastReceivedLine.trim().toLowerCase() === "ok") {
-            console.log(`↓ 'OK' per: ${line}`);
-            currentIndex++;
-            sendNextLine();
+        if (lastReceivedLine.trim()) {
+            logMessage(`↓ ${line}`);
+            currentIndex++;  // Passa al prossimo comando
+            sendNextLine();  // Invia il prossimo comando se presente
         } else if (lastReceivedLine.toLowerCase().startsWith("error:")) {
-            logMessage(`❌ Errore ricevuto da GRBL: ${lastReceivedLine}`);
+            const errorCode = lastReceivedLine.split(":")[1].trim();
+            logMessage(`❌ Errore ricevuto da GRBL: ${errorCode}`);
+            // Puoi anche aggiungere un'azione per gestire gli errori (ad esempio un reset)
+            if (attempts < MAX_RETRIES) {
+                logMessage(`Tentativo ${attempts + 1} di invio della riga.`);
+                await sendGCodeLine(line, attempts + 1);  // Ritenta l'invio
+            } else {
+                logMessage(`⚠️ Errore irreversibile: ${errorCode}`);
+            }
+        } else if (lastReceivedLine.toLowerCase().startsWith("alarm:")) {
+            // Gestisci gli allarmi
+            const alarmCode = parseInt(lastReceivedLine.match(/\d+/)[0]);
+            logMessage(`🚨 Allarme GRBL ricevuto: ${alarmCode}`);
+
+            if ([2, 4, 5, 7, 10].includes(alarmCode)) {
+                logMessage(`Tentativo di reset automatico per allarme ${alarmCode}...`);
+                await softReset();
+            } else if ([1, 3, 6].includes(alarmCode)) {
+                logMessage(`Soft reset + Homing necessari per allarme ${alarmCode}...`);
+                await softReset();
+                await homing();
+            } else {
+                logMessage(`⚠️ Allarme sconosciuto, controllo manuale necessario.`);
+            }
         } else {
             logMessage(`Risposta non valida: ${lastReceivedLine}`);
         }
@@ -1598,32 +1532,43 @@ async function waitResponse(line, attempts = 0) {
     }
 }
 
-async function readSerialData() {
-    let buffer = "";
-    try {
-        while (true) {
-            const { value, done } = await reader.read();
-            if (done) break;
-            buffer += new TextDecoder().decode(value);
-            const lines = buffer.split("\n");
-            buffer = lines.pop();
-            for (const line of lines) {
-                const trimmedLine = line.trim();
-                if (trimmedLine) {
-                    lastReceivedLine = trimmedLine;
-                }
-            }
-        }
-    } catch (error) {
-        logMessage("⚠️ Errore lettura seriale: " + error);
-    } finally {
-        reader.releaseLock();
-    }
+// Funzione per eseguire un soft reset
+async function softReset() {
+    logMessage("🔄 Eseguito soft reset...");
+    await sendGCodeLine("~");  // Comando per soft reset in GRBL
 }
 
+// Funzione per eseguire l'homing
+async function homing() {
+    logMessage("🔄 Eseguito homing...");
+    await sendGCodeLine("$H");  // Comando per homing in GRBL
+}
 
+        async function readSerialData() {
+            let buffer = "";
+            try {
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    buffer += new TextDecoder().decode(value);
+                    const lines = buffer.split("\n");
+                    buffer = lines.pop();
+                    for (const line of lines) {
+                        const trimmedLine = line.trim();
+                        if (trimmedLine) {
+                            lastReceivedLine = trimmedLine;
+                        }
+                    }
+                }
+            } catch (error) {
+                logMessage("⚠️ Errore lettura seriale: " + error);
+            } finally {
+                reader.releaseLock();
+            }
+        }
 
-        function logMessage(msg){
+        function logMessage(msg) {
+
             if (logBuffer.length > maxLogLines) {
                 logBuffer.shift();
             }
