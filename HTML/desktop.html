@@ -1,0 +1,1534 @@
+<!-- /HTML/desktop.html -->
+<!DOCTYPE html>
+<html xml:lang="en" lang="en">
+        <head>
+                <!-- Meta tags to prevent caching -->
+                <meta http-equiv="cache-control" content="max-age=0">
+                <meta http-equiv="cache-control" content="no-cache">
+                <meta http-equiv="expires" content="-1">
+                <meta http-equiv="expires" content="Tue, 01 Jan 1980 11:00:00 GMT">
+                <meta http-equiv="pragma" content="no-cache">
+                <meta charset="UTF-8">
+
+                <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+
+                <!-- style -->    
+                <link rel="stylesheet" href="../CSS/styles.css">
+                <link rel="stylesheet" href="../CSS/drawing.css">
+                <link rel="stylesheet" href="../CSS/jquery.css">
+
+                <!-- third parties -->
+                <script src="../JS/src/jquery.js"></script>
+                <script src="../JS/src/jquery-ui.js"></script>
+                <script src="../JS/src/fabric.js"></script>               
+                <script src="../JS/ace/ace.js"></script>                
+                <script src="../JS/src/clipper.js"></script>         
+                <script src="../JS/src/opentype.js"></script>
+                <script src="../JS/src/sortable.js"></script>   
+                <script src="../JS/src/potrace.js"></script>
+                <script src="../JS/src/polyfill.js"></script>
+                <script src="../JS/src/drawing.js"></script>
+                <script src="../JS/src/ruler.js"></script>
+        </head>
+
+        <style>
+                * {box-sizing: border-box}
+
+                html, body {width:100%; height:auto; margin:0; color:#fff}        
+                .hidden-cursor {cursor: none} 
+                @font-face {
+                        font-family: test-family;
+                        src: url("FONT/Roboto-Black.ttf")
+                }   
+         
+                ::-webkit-scrollbar {width:7px}
+                ::-webkit-scrollbar-thumb {
+                        background:rgba(0,0,0,0);
+                        border-radius: 4px; cursor:pointer
+                }
+
+                ::selection {color:white; background: rgb(25,25,25)}  
+
+                .center_H{position:absolute; text-align: center}  
+                
+                .bs {
+                        position:absolute;
+                        width: 100px; height: 20px;
+                        color:#fff; font-size:10px; 
+                        border:none; background:none; outline:none
+                }
+                .btImg {
+                        position:absolute;
+                        width: 100px; height: 20px;
+                        color:#fff; cursor:pointer; font-size:10px;
+                        border: none; background:none; outline:none
+                }
+                .btImg:hover {color:#f0f}                   
+
+                #_2D {
+                        overflow-x:hidden;
+                        position: absolute;
+                        background:#080808;
+                        top: 20px; left: 0; right: 0;
+                        width: 100%; height: 100%; 
+                }
+
+                #n_Line {
+                        outline:none;user-select: none;
+                        position:absolute; resize:none;
+                        font-size:18px; line-height:0.72; 
+                        border: 0; text-align: left;
+                        overflow:hidden; width:30px;
+                        color:gray;top:35px; height:100%; 
+                        background:transparent}
+                #n_Line:focus-visible,
+
+                #editor {position:absolute;bottom:0; top:10px; border: 0;
+                        left:0; right:0; line-height: 1.2;background:#050505}
+                .ace_editor *{font-size: 11px !important; color:gray}
+                .ace_editor {border: none !important}
+                .ace_scrollbar {display: none !important}
+                .ace_editor .ace_marker-layer .ace_selection {background:#202020}
+                .ace_editor .ace_cursor {color: red}
+                .ace_tooltip {display: none !important} 
+                #TA.closed {transform: translateX(100%)}                   
+
+                a {color:gray}
+                                 
+                #progress-container {
+                        position:absolute;     
+                        width: 100%; bottom:0px;
+                        background-color:transparent;
+                        height: 2px; margin-top: 0px;
+                }
+                #progress-bar {
+                        width: 0%; height: 100%;
+                        background-color: #ff00ff;
+                }
+
+                .fade_2 {opacity: 0; transition: opacity 2s ease-in-out}
+
+                #crud-wrapper {
+                        position: absolute;
+                        width:450px; top:50px; right:0px;
+                }
+                #crud {
+                        flex-direction: column;            
+                        padding: 2px 2px 2px 0px;            
+                        display:flex; max-width:450px;    
+                        position:relative; overflow-y:auto;
+                }
+                #fileList {
+                        width: 100%;
+                        list-style: none;
+                        padding: 0; margin: 0;
+                }
+                #fileList li {
+                        font-size:12px;
+                        display: flex;
+                        align-items: center;
+                        padding: 2px; width: 100%;
+                        justify-content: space-between;    
+                }
+                .button-container {
+                        display: flex; gap: 10px;
+                        justify-content: flex-end;    
+                }
+
+
+                .glow-box {
+                        background-color: #000;
+                        color: #999;
+                        border-radius: 8px;
+                        box-shadow: 0 0  0px #f0f,
+                                    0 0 10px #f0f;
+                }                
+        </style>
+                                                              
+        <body>
+                        <div id="splash" style="z-index:10; position:absolute; width:100%; height:100%; left:50%; transform:translateX(-50%)">
+                                <script>
+                                        $(document).ready(function(){
+                                                $("#splash").load("../HTML/anim.html", function(){
+                                                        setTimeout(() => {
+                                                                $("#splash").addClass("fade_2")
+                                                                setTimeout(() => { $("#splash").remove(); }, 2000)
+                                                        }, 3000)
+                                                }); setTimeout(() => {setWorkArea()},5000)
+                                        })
+                                </script>
+                        </div>
+
+                                                              
+                        <!-- html HEAD -->
+                        <div id="head"  style="background:#080808;
+                        z-index:9;border-bottom:0px solid #3c3c3c; 
+                        width: 100%; height:40px; position: fixed;
+                        top:  0px;  border-top: 0px solid #11e1e">
+
+                                <div class="bs" style="top:13px; width:200px; left:30px" onclick="">
+                                        <img src="../IMG/HLB.png" width="200px" height="16px"/>
+                                </div>
+
+                                <button class="btImg" style="cursor: pointer; font-size:10px;
+                                top:10px; right:180px" onclick="">about</button>              
+
+                                <button class="btImg" style="cursor: pointer; font-size:10px;
+                                top:10px; right:100px" onclick="window.location.reload(true)">refresh</button> 
+
+                                <input style="display: none" type="file" id="input"/>
+
+                                <div id="progress-container">
+                                        <div id="progress-bar"></div>
+                                </div>                                 
+                        </div>
+
+                        <div id="_2D">
+                                <script>                                                    
+                                        $("#_2D").load("../HTML/rend_1.html")                                                              
+                                </script>
+                        </div>
+                   
+
+                        <button style="position:fixed; z-index:100; left:1px; top:40px; width:18px; height:20px; border:0; cursor:pointer;
+                        background: #101010; border-right: 1px solid #888; border-bottom: 1px solid #888;" onclick="createInteractiveGuide()"></button>
+                        <div id="horizontalLabel" class="label"></div><div id="verticalLabel" class="label"></div>                 
+
+                        <!-- UserGUIDE -->
+                        <button id="OCug" class="bs" style="z-index:290; cursor:pointer; 
+                        width:150px; top:10px; left:300px" title="user guide" onclick="window.open('https://github.com/marco-f/PWA-HobbyLASER/wiki/1_home', '_blank')">
+                                <img id="sx" style="display:block" src="../IMG/sx.svg" width="24px" height="10px"/> 
+                        </button>
+
+                        <div id="OV" style="z-index:400; border:0px solid #3c3c3c; display:none;
+                        position:fixed; width:101%; height:100%; left:0; top:40px; background:transparent"></div>                              
+
+
+                        <!-- editor (scriptArea) -->
+                        <div id="TA" style="border-left:1px solid #3c3c3c; z-index:150; resize: horizontal; cursor: ew-resize; transform: translateX(100%);
+                        position: fixed; width: 40%; height:100%; right: 0; top: 60px; background: #050505; transition: transform 0.5s ease">
+                                <!-- Textarea for line indicators (read-only) -->
+                                <textarea id="n_Line" style="right: 0px; top: 10px; height: calc(100% - 150px); overflow: hidden" wrap="off" readonly></textarea>
+                                <!-- Div container for the Ace editor -->
+                                <div id="editor" class="language-javascript" style="position: absolute; color: white; width: calc(50% - 50px); height: calc(100% - 150px)"></div>
+
+                                <script>
+                                        // Get the editor container element and disable the default context menu propagation
+                                        var cE = document.getElementById('editor');
+                                        cE.addEventListener("contextmenu", function(e) {
+                                                e.stopPropagation();
+                                        });
+
+                                        // Get the textarea for line numbers and set its styling
+                                        var nL = document.getElementById('n_Line');
+                                        nL.style.fontSize = '18px';
+                                        nL.style.pointerEvents = "none";
+
+                                        // Initialize Ace editor in the "editor" div
+                                        var editor = ace.edit("editor");
+                                        var taClosed = true;  // Flag to track whether the TA pane is closed
+
+                                        // Function to update the layout based on the current width of the TA container
+                                        function updateLayout() {
+                                                let taWidth = $("#TA").width();
+                                                let editorWidth = taWidth - 30;
+                                                $("#editor").width(editorWidth);
+                                                if (typeof editor.resize === 'function') {
+                                                        editor.resize();
+                                                }
+                                                if (taWidth <= 50){$("#n_Line").hide()}
+                                                else {
+                                                        $("#n_Line").show()}
+                                        }
+
+                                        // Function to close the TA pane if it is open
+                                        function TAClose() {
+                                                if (!taClosed) {
+                                                        $("#TA").css("transform", "translateX(100%)");
+                                                        taClosed = true;
+                                                }
+                                        }
+
+                                        // Function to open the TA pane if it is closed
+                                        function TAOpen() {
+                                                if (taClosed) {
+                                                        $("#TA").css("transform", "translateX(0)");
+                                                        taClosed = false;
+                                                        setTimeout(updateLayout, 500);
+                                                }
+                                        }; //setTimeout(TAOpen, 2000);
+
+                                        // Make the TA container resizable horizontally with jQuery UI
+                                        $("#TA").resizable({
+                                                handles: 'w',
+                                                minWidth: 0,
+                                                maxWidth: $(window).width() - 250,
+                                                resize: function(event, ui) {
+                                                        let newWidth = ui.size.width;
+                                                        let editorWidth = newWidth - 30;
+                                                        $("#editor").width(editorWidth);
+                                                        if (typeof editor.resize === 'function') {
+                                                                editor.resize();
+                                                        }
+                                                        if (newWidth <= 50){
+                                                                $("#n_Line").hide()}
+                                                        else {
+                                                                $("#n_Line").show()}
+                                                },
+                                                stop: function(event, ui){
+                                                        let newWidth = ui.size.width;
+                                                        if (newWidth <= 50 && !taClosed) {
+                                                                TAClose();
+                                                        }
+                                                }
+                                        });
+                                        $(window).on('resize', updateLayout);
+
+                                        // Configure Ace editor settings
+                                        editor.setTheme("ace/theme/pastel_on_dark");
+                                        editor.session.setMode("ace/mode/javascript");
+                                        editor.getSession().setUseWrapMode(true);
+                                        editor.getSession().setWrapLimitRange(null, null);
+                                        editor.setOption("scrollPastEnd", 0);
+                                        editor.setOption("showGutterTooltip", false);
+                                        editor.setBehavioursEnabled(false);
+                                                              
+                                        editor.setOptions({
+                                                fontFamily: "'Courier New', monospace"
+                                        });
+                                        editor.getSession().setUseWorker(false);
+                                        editor.session.clearAnnotations();                     
+
+                                        // Update the line indicators on content change
+                                        editor.getSession().on('change', function() {
+                                                end_line();
+                                        });
+
+                                        // Set initial content for the Ace editor (a sample module function)
+                                        editor.setValue(`function module(numberOfTeeth, radius, heightOfTooth){
+        var paths = [[]];    
+        var centerX = 30; 
+        var centerY = 30;
+        var radiusMinusTeeth = radius - heightOfTooth;
+
+        var distancesOfVerticesFromCenter = [
+                radius, radius,
+                radiusMinusTeeth,
+                radiusMinusTeeth,
+        ];
+        var verticesPerTooth = distancesOfVerticesFromCenter.length;
+        var numberOfVertices = numberOfTeeth * verticesPerTooth;
+
+        for (var v = 0; v < numberOfVertices; v++) {
+                var angleInRadians = (Math.PI * 2 * v) / numberOfVertices;
+                var distanceOfVertexFromCenter = distancesOfVerticesFromCenter[v % verticesPerTooth];
+
+                var drawPosX = centerX + distanceOfVertexFromCenter * Math.cos(angleInRadians);
+                var drawPosY = centerY + distanceOfVertexFromCenter * Math.sin(angleInRadians);
+
+                paths[0].push({ X: drawPosX, Y: drawPosY });        
+        }
+        return use(paths);
+}
+//module(15, 20, 4).gcode()                                                        
+//POLYLINE('M 5 5 L 50 5 L 50 50 L 5 50 L 5 5 Z').gcode()
+`);
+                                        editor.clearSelection();
+                                        editor.moveCursorTo(0, 0);
+
+                                        // Function to update the line indicator textarea based on the number of lines in the editor
+                                        function end_line() {
+                                                var totalLines = editor.getSession().getLength(),
+                                                    outarr = [];
+                                                for (var x = 0; x < totalLines; x++) {
+                                                        outarr[x] = '↩';
+                                                }
+                                                nL.value = outarr.join('\n');
+                                        }
+
+                                        // Function to append text to the current content in the Ace editor
+                                        function appToEdt(text) {
+                                                var session = editor.getSession();
+                                                var oldText = session.getValue();
+                                                session.setValue(oldText + text);
+                                        }
+
+                                        // Function to auto-scroll the editor to the bottom when content changes
+                                        function autoScroll() {
+                                                var session = editor.getSession();
+                                                var length = session.getLength();
+                                                editor.scrollToLine(length, true, true, function() {});
+                                        }
+                                        editor.getSession().on('change', function() {
+                                                autoScroll();
+                                        });
+
+                                        // Function to remove a function call from the editor's content based on a search string
+                                        function remToEdt(searchString) {
+                                                var content = editor.getValue();
+                                                var regex = new RegExp(searchString + "\\([^)]*\\)", "g");
+                                                var lines = content.split("\n"),
+                                                    modifiedLine = -1;
+                                                for (let i = 0; i < lines.length; i++) {
+                                                        if (regex.test(lines[i])) {
+                                                                modifiedLine = i;
+                                                                break;
+                                                        }
+                                                }
+                                                var updatedContent = content.replace(regex, "\n");
+                                                editor.setValue(updatedContent, -1);
+                                                if (modifiedLine !== -1) {
+                                                        editor.gotoLine(modifiedLine + 2, 0, true);
+                                                }
+                                                editor.focus();
+                                        }
+
+                                        // Add a custom command to execute a script using Ctrl-Enter (or Command-Enter on Mac)
+                                        editor.commands.addCommand({
+                                                name: "executeCommand",
+                                                bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
+                                                exec: function(editor) {
+                                                        var command = editor.getValue().trim()
+                                                        try {runSCRIPT()}
+                                                        catch (e){console.error("error", e)}
+                                                }
+                                        });
+                                        var runSCRIPT = () => {
+                                                try{
+                                                        clearCNVS(); TAClose()
+                                                        var userCode = editor.getValue()
+                                                        var content = edtContent(userCode)
+                                                        //content = content.replace(/;\)/g, ')')
+                                                        if(cancBool == false){}
+                                                        else if (cancBool == true){
+                                                                canvas.remove(imgInstance)
+                                                        }
+                                                        pts = eval(content)
+                                                        tempGuideLines = interactiveGuides
+                                                        for (var i = 0; i < tempGuideLines.length; i++){
+                                                                var guidePair = tempGuideLines[i]
+                                                                canvas.add(guidePair.verticalLine).bringToFront()                                        
+                                                                canvas.add(guidePair.horizontalLine).bringToFront()
+                                                                canvas.add(guidePair.intersectionCircle).bringToFront()                                        
+                                                        }
+                                                        cancBool = false; //resultPath(pt)
+                                                } catch(error){console.error(error)}
+                                        }                                                             
+                                </script>
+                        </div>
+                    
+                        <!-- Footer container (acts as a control panel and log area) -->
+                        <div id="footer" style="z-index:300; cursor:default; font-family:'Monospace'; font-size:9px; overflow: hidden; left:0;
+                        position:fixed; bottom:0px; width:100%; height:80px; background:#080808; border-top:2px solid #000; color:#ffffff">
+
+                                <!-- Console log display area -->
+                                <div id="cnsLog" style="position: absolute; overflow-x: hidden; background:#050505; line-height:1.5;
+                                font-size:10px; border-top:1px solid #3c3c3c; color:gray; top:0px; left:0px; width: 100%; height: calc(100% - 25px)">
+                                        <p id="cnsl" style="position:absolute; top:-5px; right:20px; font-size:10px">>_ ConsoleLog</p>
+                                </div>
+                                                      
+                                <!-- JavaScript code -->
+                                <script>
+                                        var toggleFTR;
+                                        // Function to handle footer resizing and layout updates
+                                        function ftr(){
+                                                let previousHeight = 80;
+                                                function updateLayout(){
+                                                        var footerHeight = $("#footer").height();
+                                                        var windowHeight = $(window).height();
+                                                        var desiredH = windowHeight - footerHeight +20;
+                                                        $("#_2D").height(desiredH);
+                                                        $("#gcBtnainer").height(desiredH-35);
+                                                }
+
+                                                FTRClose = function(){
+                                                        var currentHeight = $("#footer").height();
+                                                        if (currentHeight > 80){
+                                                            previousHeight = currentHeight;
+                                                            $("#footer").height(120);
+                                                            $("#footer").css('top', 'calc(100% - 80px)');
+                                                            updateLayout();
+                                                        }
+                                                }
+                                                FTROpen = function(){
+                                                        $("#footer").height(previousHeight);
+                                                        $("#footer").css('height', `80px)`);
+                                                        updateLayout();
+                                                }
+                                                
+                                                $("#footer").resizable({
+                                                        handles: 'n',
+                                                        minHeight: 80,
+                                                        maxHeight: 600,
+                                                        resize: updateLayout 
+                                                });
+                                                $(window).on('resize', updateLayout);
+                                                $(window).trigger('resize');
+                                        }; ftr()
+
+                                        var cnsLog = document.getElementById('cnsLog');
+                                        function logging(){
+                                                function customLog(type, color, ...args){
+                                                var output = "", t = new Date();
+                                                var time = t.getHours() + ":" + t.getMinutes() + ":" + t.getSeconds() + "&nbsp&nbsp"
+
+                                                args.forEach(arg => {
+                                                        output += `<span style='color:${color}'>`
+                                                        if (arg instanceof Error){
+                                                                output += `<b>${arg.name}: ${arg.message}</b><br>`
+                                                        } 
+                                                        else if (typeof arg === "object" && typeof JSON === "object"){
+                                                                output += JSON.stringify(arg, null, 2);
+                                                        } 
+                                                        else if (typeof arg === "string" && arg.startsWith("http")){
+                                                                output += `<a href="${arg}" target="_blank" class="gnu-license-link" >${arg}</a>`
+                                                        } else {output += arg}
+                                                        output += "</span>&nbsp"
+                                                })
+
+                                                cnsLog.innerHTML += `<br>
+                                                        <span style='color: rgb(60,60,60); line-height:0.2'>${"&nbsp&nbsp" + time}</span>
+                                                        <span style='color: ${color}; font-weight:bold; line-height:0.2'>${"&nbsp&nbsp" + type.toUpperCase()}</span>
+                                                        <span style='color: red; left:20; line-height:0.2'> >>> </span>
+                                                        ${output}`
+                                                }
+                                                console.log = function(...args) {
+                                                        customLog('log', 'gray', ...args)
+                                                }
+                                                console.error = function(...args) {
+                                                        customLog('error', '#b3d5e0', ...args)
+                                                }
+                                                console.log('Copyright © 2020-2024 HobbyLaser dev. This program is free software; under the terms of the GNU\
+                                                General Public License as published by the Free Software Foundation', 'https://www.gnu.org/licenses/licenses.html')   
+                                        }; logging()
+                                        var scrollTimeout
+                                        var observer = new MutationObserver(() => {
+                                                if (scrollTimeout) clearTimeout(scrollTimeout)
+                                                scrollTimeout = setTimeout(() => {
+                                                        cnsLog.scrollTop = cnsLog.scrollHeight
+                                                }, 100)
+                                        }); observer.observe(cnsLog, {childList: true})  
+
+                                        var objNumber = 0;
+                                        // Function to log the number of objects on the canvas (if applicable)
+                                        function addToConsole(){
+                                                objNumber = canvas.getObjects().length - 1;
+                                                console.log("HL obj on canvas: " + objNumber);
+                                        }                         
+                                </script>             
+                        </div>
+                       
+                <!-- Bottom fixed control bar -->
+                <div id="srv" style="z-index:650; position:fixed; bottom:0px; width:100%; height:
+                25px; left:0px; font-size:11px; background:#080808; border-top:1px solid #ff00ff">
+
+                        <!-- Position indicators -->
+                                <p id="mPos" style="position:fixed; color:gray; bottom:-7px; left: 20px; font-size:11px">pos (x:, y:)</p>
+                                <p id="cPos" style="position:fixed; color:gray; bottom:-7px; left:200px; font-size:11px">pos (row:, col:)</p>
+                                <p id="wa" style="position:fixed; color:gray; bottom:-7px; left:380px; font-size:11px">WorkArea (w:, h:)</p>
+                        <p id="fps" style="position:fixed; color:gray; bottom:-7px; right:20px; width:70px; font-size:11px"></p>
+
+                        <p style="position:fixed; color:gray; bottom:-7px; right:300px; width:70px; font-size:11px; cursor:pointer" onclick="TAOpen()">OpenTA</p>                              
+
+                        <!-- Clear Log and Reset Swap buttons with onclick events -->
+                        <p style="position:fixed; color:gray; bottom:-7px; right:150px; width:70px; font-size:11px; cursor:pointer"
+                        onclick="cnsLog.innerHTML=''; console.log('Copyright © 2020-2024 HobbyLaser dev. This program is free software; under the terms\
+                        of the GNU General Public License as published by the Free Software Foundation','https://www.gnu.org/licenses/licenses.html')">
+                                < Clear Log >
+                        </p>                                
+
+                        <script>               
+                                var pos = document.getElementById("mPos")
+                                function mousePos(ev) {
+                                        var dpi = window.devicePixelRatio * 96; // Estimated DPI
+                                        posX = (ev.clientX * (25.4 / dpi)).toFixed(0) -5
+                                        posY = (ev.clientY * (25.4 / dpi)).toFixed(0) -15
+                                        pos.innerHTML = 'mPos (x: ' + posX + ', y: ' + posY +')'
+                                }; document.addEventListener('mousemove', mousePos, false)
+
+                                var cur = document.getElementById("cPos")
+                                function cursorPos(ev) {
+                                        var cursorPosition = editor.getCursorPosition()
+                                        row = cursorPosition.row + 1
+                                        col = cursorPosition.column
+                                        cur.innerHTML = 'cPos (row: ' + row + ', col: ' + col +')';
+                                }; document.addEventListener('mousemove', cursorPos, false)
+
+                                var wa = document.getElementById("wa")
+                                function calculateWASize(){
+                                        wa.innerHTML = 'WorkArea (w: ' + dWidth + ',h: ' + dHeight +')';
+                                }; calculateWASize()                               
+                       
+                                var fpsElement = document.getElementById('fps')
+                                var frame = 0, startTime = performance.now();
+                                function calculateFPS(){
+                                        frame++;
+                                        var now = performance.now()
+                                        if (now - startTime > 1000){
+                                                var fps = (frame / ((now - startTime) / 1000)).toFixed(2)
+                                                fpsElement.textContent = `${fps} fps`
+                                                frame = 0; startTime = now
+                                        }; requestAnimationFrame(calculateFPS)
+                                }; calculateFPS()               
+                        </script>
+                </div>
+
+                <!-- GCode Section -->                                            
+                <div id="GCC" style="z-index:350; position:absolute; background:#101010; width:780px; height:300px; 
+                left: 50%; top: 50%; transform: translate(-50%,-50%); border: 1px solid #3c3c3c; display:none">
+                        <h3 style="text-align:center">< GCODE GENERATOR ></h3>
+                        <button class="bs" style="top:20px; right:-20px; cursor:pointer" onclick="toggleGCconv()">X</button>       
+                               
+                        <div class="buttons-container" style="top:70px">
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px; color:#fff">MODE</span>
+                                <button class="btRD" id="m_1" onclick="setMODE('m_1')">●</button>cutter
+                                <button class="btRD" id="m_2" onclick="setMODE('m_2')">●</button>engrave                  
+                                <button class="btRD" id="m_3" onclick="setMODE('m_3')">●</button>image
+                        </div>
+                                          
+                        <div id="t_1" class="buttons-container" style="top:120px">
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:70px">min POWER(%)</span>
+                                <input class="txtInp" type="text" id="_02" placeholder="set power" maxlength="4" value="0"/>
+
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px;">max POWER(%)</span>
+                                <input class="txtInp" type="text" id="_03" placeholder="set power" maxlength="4" value="1000"/>
+
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px">speed TRAVEL</span>
+                                <input class="txtInp" type="text" id="_04" placeholder="radius" maxlength="4" value="1000"/>
+
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px;">speed LASER</span>
+                                <input class="txtInp" type="text" id="_05" placeholder="radius" maxlength="4" value="600"/>
+                                          
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px">n° PASS.</span>
+                                <input class="txtInp" type="text" id="_06" placeholder="n° passes" value="1"/>
+                        </div>
+                        <div id="t_2" class="buttons-container" style="top:160px">
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:70px">rowsPerMM</span>
+                                <input class="txtInp" type="text" id="_07" placeholder="rows/mm" maxlength="4" value="3"/>
+
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px">Z-AXIS</span>
+                                <input class="txtInp" type="text" id="_08" placeholder="inc. Z" maxlength="4" value="0"/>
+
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px">Z-AXIS</span>
+                                <input class="txtInp" type="text" id="_09" placeholder="inc. Z" maxlength="4" value="0"/>                                
+
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px">&nbsp;air&nbsp;
+                                ASSIST</span><input class="txtInp" type="text" id="_10" placeholder="set air" maxlength="4" value="0"/>
+                               
+                                <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px">fileNAME</span>
+                                <input class="txtInp" type="text" id="_11" placeholder="set name" value="a"/>
+                        </div>
+                        <div id="t_3" class="buttons-container" style="top:210px; width:100%">
+                                <div id="d_1" style="width:auto; height:auto; margin:0 auto; position:relative; display:flex; align-items:center; gap:6px">
+                                        <span class="txtInp" style="background:transparent; border:0; cursor:default; width:70px">download</span>
+                                        <button class="btRD" id="dl" onclick="setDL()">●</button>
+                                
+                                        <span class="txtInp" style="background:transparent; border:0; cursor:default; width:50px">toGCODE</span>
+                                        <button class="btTool" onclick="obj2gc()">create</button>                    
+                               </div>                     
+                        </div>                                  
+
+                        <p class="bs" style="width:100%; top:265px; text-align:center">* download if you need to keep the file</p>
+                               
+                        <script>                       
+                                var t_1 = document.getElementById('t_1')
+                                var t_2 = document.getElementById('t_2')
+                                var t_3 = document.getElementById('t_3')
+                                          
+                                var gcBool = false
+                                function toggleGCconv(){
+                                        if(gcBool == false){
+                                                $('#GCC').show(); FTRClose(); gcBool = true; GCSenderHide()
+                                        } else if(gcBool == true){$('#GCC').hide(); gcBool = false}
+                                }                              
+                                var mode = ''
+                                var setMODE = function(activeId){
+                                        var button1 = document.getElementById('m_1')
+                                        var button2 = document.getElementById('m_2')
+                                        var button3 = document.getElementById('m_3')
+                                        if (activeId === 'm_1'){
+                                                        button1.focus(); button2.blur(); button3.blur()
+                                                        mode = 'cutter'
+                                        } else if (activeId === 'm_2'){
+                                                        button1.blur(); button2.focus(); button3.blur()
+                                                        mode = 'engrave'
+                                        } else if (activeId === 'm_3'){
+                                                        button1.blur(); button2.blur(); button3.focus()
+                                                        mode = 'image'
+                                        }        
+                                }
+                                var dlBool = false
+                                var setDL = function(){
+                                        var button4 = document.getElementById('dl')
+                                        if (dlBool == false){
+                                                button4.focus(); dlBool = true; console.log('true')
+                                        }
+                                }
+                        </script>    
+                </div>
+                    
+                <div id="gcBtn" style="z-index:450; position:absolute; left:200px; right:200px; height:45px;
+                bottom:120px; background:#101010; border:1px solid #f0f; border-radius:50px; display:none" >
+
+                        <p class="btImg" style="top:0px; right:15px; font-size:10px; width:20px" onclick='GCSenderHide()'>X<p>                        
+                     
+                        <div id="serial" class="txtInp" style="position:absolute; top:11px; left:20px; width:130px "><span id="portName">N/A</span></div>
+                        <button id="connect" class="btTool" style="position:absolute; top:10px; left:180px">connect</button>
+                        <button id="stop" class="btTool" style="position:absolute; top:10px; left:280px" >Stop</button>                  
+                        <button id="send" class="btTool" style="position:absolute; top:10px; left:380px" >Invia G-code</button>
+                        <button id="pause" class="btTool" style="position:absolute; top:10px; left:480px"  >Pausa</button>
+                        <button id="resume"class="btTool" style="position:absolute; top:10px; left:580px"  >Riprendi</button>
+
+                        <script>                            
+                                var GCSenderShow = function(){
+                                        lines = 0
+                                        progressBar.innerHTML = ''
+                                        contPreview.style.visibility = 'visible'
+                                        progressBar.style.width = "0%";                        
+                                        $("#OV").show(); $("#gcBtn").show()
+                                        FTRClose(); TAClose(); toggleGCconv()
+                                        $("#gcBtn").draggable()
+                                }
+                                var GCSenderHide = function(){
+                                        $("#OV").hide(); $("#gcBtn").hide()
+                                        contPreview.style.visibility = 'hidden'
+                                        setTimeout(() => {
+                                                progressBar.style.width = "0%"
+                                                sentGCodeLines = 0; totalGCodeLines = 0
+                                        }, 1000)                                      
+                                }
+
+                                var usedFileNames = [];
+                                function makeUniqueFlName(value){
+                                        var uniqueValue = value, counter = 1
+                                        while (usedFileNames.includes(uniqueValue)){
+                                                uniqueValue = value + "_" + counter
+                                                counter++
+                                        }; return uniqueValue
+                                }
+
+                                function obj2gc(){                        
+                                        try {
+                                                if (mode === 'cutter'){svg2gc(md=0)}
+                                                else if (mode === 'engrave'){svg2gc(md=1)}
+                                                else if (mode === 'image'){img2gc()}
+                                                else {throw new Error("mode must be 'image', 'cutter' or 'engrave'")}
+                                        } catch (error){console.error(error.message)}
+                                        
+                                        var content = editor.getValue()
+                                        var updatedContent = content.replace(/obj2gc\([^)]*\)/g, "")
+                                        editor.setValue(updatedContent, -1); editor.focus()                          
+                                }
+
+                                function svg2gc(md){
+                                        function contour() {
+                                                for (var pass = 0; pass < passes; pass++) {
+                                                        var zStep = zeta * pass;
+                                                        paths.forEach(originalPath => {
+                                                                var path = originalPath.slice()
+                                                                if (path.length > 0) {
+                                                                        let startPoint = path[0]
+                                                                        gcode += `G0 X${startPoint.X.toFixed(2)} Y${(dHeight + 6 - startPoint.Y).toFixed(2)} F${speedTRVL}\n`
+                                                                        gcode += `G4 P${pause}; Pausa per stabilizzazione;\n`
+                                                                        gcode += `M3;\n`
+
+                                                                        path.forEach((point, index) => {
+                                                                                if (index > 0) {
+                                                                                        gcode += `G1 X${point.X.toFixed(2)} Y${(dHeight + 6 - point.Y).toFixed(2)} F${speedLSR}\n`
+                                                                                }
+                                                                        })
+                                                                        gcode += `M5;\n`
+                                                                }
+                                                        })
+                                                }; return gcode;
+                                        }
+
+                                        function intersectInfill(infillLines){
+                                                window.alert = function(){}
+                                                var clipper = new ClipperLib.Clipper()
+                                                var infillPaths = infillLines.map(line => 
+                                                line.map(([x, y]) => ({ X: x * 1000, Y: y * 1000 })))
+
+                                                var scaledPaths = JSON.parse(JSON.stringify(paths))
+                                                ClipperLib.JS.ScaleUpPaths(scaledPaths, 1000)
+
+                                                var result = new ClipperLib.Paths();
+                                                clipper.AddPaths(infillPaths, ClipperLib.PolyType.ptSubject, false)
+                                                clipper.AddPaths(scaledPaths, ClipperLib.PolyType.ptClip, true)
+
+                                                var subj = ClipperLib.PolyFillType.pftNonZero
+                                                var clip = ClipperLib.PolyFillType.pftNonZero
+
+                                                clipper.Execute(ClipperLib.ClipType.ctIntersection, result, subj, clip)
+                                                ClipperLib.JS.ScaleDownPaths(result, 1000)
+                                                return result
+                                        }
+
+                                        function infillLines(rect){
+                                                var lines = []
+                                                for (let y = rect[1]; y <= rect[3]; y += 1/rowPerMM){
+                                                        const line = [
+                                                                [rect[0], y], [rect[2], y]
+                                                        ]; lines.push(line)
+                                                }; return lines
+                                        }
+
+                                        function engrave(intersectedPaths){
+                                                isForward = true
+                                                for (var pass = 0; pass < passes; pass++){
+                                                        let zStep = zeta * pass                                
+                                                        intersectedPaths.forEach(originalPath => {
+                                                                var path = isForward ? originalPath.slice() : originalPath.slice().reverse()
+                                                                        path.forEach((point, index) => {
+                                                                        if(index === 0){
+                                                                                gcode += `G0 X${point.X.toFixed(2)} Y${dHeight + 6 - (point.Y).toFixed(2)} F${speedTRVL}\n`
+                                                                        } else {
+                                                                                var prevPoint = path[index - 1]
+                                                                                gcode += `G1 X${(point.X).toFixed(2)} Y${dHeight + 6 - (point.Y).toFixed(2)} Z${zStep} F${speedLSR} S${maxPWR}\n`
+                                                                        }
+                                                                }); isForward = !isForward                                        
+                                                        })
+                                                }; return gcode
+                                        }
+                                      
+                                        Points = svgpath.replace(/,/g, ' ')
+                                        Points_1 = svgPathToPoints(Points)
+                                        pointsArray = Points_1.map(cmd => cmd.command + (cmd.values ? cmd.values.join(' ') : '')).join(' ')
+                                        Points_2 = svgPathToClipperPaths(pointsArray)
+
+                                        var paths = use(Points_2.slice());//.mirror('y')
+
+                                        var bounds = calculateBoundingBox(paths)
+
+                                        var minPWR = parseInt($("#_02").val())                     
+                                        var maxPWR = parseInt($("#_03").val())
+                                        var speedTRVL = parseInt($("#_04").val())                     
+                                        var speedLSR = parseInt($("#_05").val())
+                                        var passes = parseInt($("#_06").val())                   
+                                        var rowPerMM = parseInt($("#_07").val())
+                                        var zeta = parseFloat($("#_08").val())
+                                        var air = parseInt($("#_09").val())
+                                        var flName = $("#_10").val()                       
+                                        try {
+                                                function isValidInteger(value){
+                                                        return Number.isInteger(value) && value >= 0
+                                                }
+                                                function isValidDecimal(value){
+                                                        return typeof value === "number" && value >= 0
+                                                }
+                                                function isValidAir(value){
+                                                        return value === 0 || value === 1
+                                                }
+                                                function isValidFlName(value){
+                                                        return(typeof value === "string" &&
+                                                                value.trim() !== "" &&
+                                                                /^[a-zA-Z0-9_-]+$/.test(value)
+                                                        )
+                                                }
+                                                function isUniqueFlName(value){
+                                                        return !usedFileNames.includes(value)
+                                                }                                
+                                                if (!isValidInteger(minPWR)){
+                                                        throw new Error("minPWR must be a positive integer")
+                                                }
+                                                if (!isValidInteger(maxPWR)){
+                                                        throw new Error("maxPWR must be a positive integer")
+                                                }
+                                                if (!isValidInteger(speedTRVL)){
+                                                        throw new Error("speedTRVL must be a positive integer")
+                                                }
+                                                if (!isValidInteger(speedLSR)){
+                                                        throw new Error("speedLSR must be a positive integer")
+                                                }
+                                                if (!isValidInteger(passes)){
+                                                        throw new Error("passes must be a positive integer")
+                                                }
+                                                if (!isValidInteger(rowPerMM)){
+                                                        throw new Error("rowPerMM must be a positive integer")
+                                                }
+                                                if (!isValidAir(air)){
+                                                        throw new Error("air must be 0 or 1")
+                                                }
+                                                if (!isValidFlName(flName)){
+                                                        throw new Error("flName must be a non-empty string");
+                                                }
+                                                if (!isUniqueFlName(flName)){
+                                                        flName = makeUniqueFlName(flName)
+                                                }; usedFileNames.push(flName)
+                                                
+                                                gcode = '', pre = '', post = ''
+                                                pause = 0.5, now = new Date()
+                                                now = 
+                                                        ('0' + now.getDate()).slice(-2) + '/' + 
+                                                        ('0' + (now.getMonth() + 1)).slice(-2) + '/' + 
+                                                        now.getFullYear() + ' ' + 
+                                                        ('0' + now.getHours()).slice(-2) + ':' + 
+                                                        ('0' + now.getMinutes()).slice(-2) + ':' + 
+                                                        ('0' + now.getSeconds()).slice(-2)                        
+                                                        
+                                                pre = "; Created using HobbyLaser "+now+"\n\n"
+                                                pre += "; Laser Speed: " + speedTRVL + " mm/sec\n"
+                                                pre += "; Travel Speed: " + speedLSR + " mm/sec\n"
+                                                pre += "; Power: [" + minPWR + ", " + maxPWR + "]\n"
+                                                pre += `G21; unità in millimetri\n`
+                                                pre += `G90; posizionamento assoluto\n`                                
+                                                pre += "G0 X0 Y0 Z0 F" + speedTRVL + "; Torna all'origine\n"
+                                                if (air !== 0) pre = pre + "M8; start airAssist\n"
+                                                pre += "M3; laser ON\n\n"                                
+                                                
+                                                post += "\nM5; laser OFF\n"
+                                                if (air !== 0) post = "\nM9; stop airAssist\n"
+                                                post += "G0 X0 Y0 Z0 F" + speedTRVL + "; Torna all'origine\n"
+                                                post += "M2; Fine del programma\n"                                
+                                                
+                                                
+                                                if (md == 0){
+                                                        contour()
+                                                        gcode = pre + gcode + post
+                                                }
+                                                else {
+                                                        const lines = infillLines([bounds.minX, bounds.minY, bounds.maxX, bounds.maxY])
+                                                        var intersectedPaths = intersectInfill(lines)
+                                                        engrave(intersectedPaths); contour()
+                                                        gcode = pre + gcode + post
+                                                }
+                                                sendGCODE(gcode); GCSenderShow()
+                                        } catch(error){console.error(error.message)}                                
+                                }
+
+                                function img2gc(){
+                                        var minPWR = parseInt($("#_02").val())                     
+                                        var maxPWR = parseInt($("#_03").val())
+                                        var speedTRVL = parseInt($("#_04").val())                     
+                                        var speedLSR = parseInt($("#_05").val())
+                                        var passes = parseInt($("#_06").val())                   
+                                        var rowPerMM = parseInt($("#_07").val())
+                                        var zeta = parseFloat($("#_08").val())
+                                        var air = parseFloat($("#_09").val())
+                                        var flName = $("#_10").val()                          
+                                        try {
+                                                function isValidInteger(value){
+                                                        return Number.isInteger(value) && value >= 0
+                                                }
+                                                function isValidDecimal(value){
+                                                        return typeof value === "number" && value >= 0
+                                                }
+                                                function isValidAir(value){
+                                                        return value === 0 || value === 1
+                                                }
+                                                function isValidFlName(value){
+                                                        return(typeof value === "string" &&
+                                                                value.trim() !== "" &&
+                                                                /^[a-zA-Z0-9_-]+$/.test(value)
+                                                        )
+                                                }
+                                                function isUniqueFlName(value){
+                                                        return !usedFileNames.includes(value)
+                                                }                                                               
+                                                if (!isValidInteger(minPWR)){
+                                                        throw new Error("minPWR must be a positive integer")
+                                                }
+                                                if (!isValidInteger(maxPWR)){
+                                                        throw new Error("maxPWR must be a positive integer")
+                                                }
+                                                if (!isValidInteger(speedTRVL)){
+                                                        throw new Error("speedTRVL must be a positive integer")
+                                                }
+                                                if (!isValidInteger(speedLSR)){
+                                                        throw new Error("speedLSR must be a positive integer")
+                                                }
+                                                if (!isValidInteger(passes)){
+                                                        throw new Error("passes must be a positive integer")
+                                                }
+                                                if (!isValidInteger(rowPerMM)){
+                                                        throw new Error("rowPerMM must be a positive integer")
+                                                }
+                                                if (!isValidAir(air)){
+                                                        throw new Error("air must be 0 or 1")
+                                                }
+                                                if (!isValidFlName(flName)){
+                                                        throw new Error("flName must be a non-empty string");
+                                                }  
+                                                if (!isUniqueFlName(flName)){
+                                                        flName = makeUniqueFlName(flName)
+                                                }; usedFileNames.push(flName)
+                                                
+                                                var passes = parseInt(passes), zStep = parseFloat(zeta), gcode = ''  
+
+                                                try{
+                                                        var imageData = ctxIMG.getImageData(0, 0, scaledWidth, scaledHeight)
+                                                        var width = imageData.width, height = imageData.height, data = imageData.data
+                                                } catch{console.error('no image on canvas'); return}
+
+                                                var travelSpeedCmd = ' F' + speedTRVL.toString()
+                                                var laserSpeedCmd = ' F' + speedLSR.toString()
+                                                var densityMultiplier = parseInt(rowPerMM)
+                                                var lineSpacing = 1 / densityMultiplier
+                                                var now = new Date()
+                                                now = 
+                                                        ('0' + now.getDate()).slice(-2) + '/' + 
+                                                        ('0' + (now.getMonth() + 1)).slice(-2) + '/' + 
+                                                        now.getFullYear() + ' ' + 
+                                                        ('0' + now.getHours()).slice(-2) + ':' + 
+                                                        ('0' + now.getMinutes()).slice(-2) + ':' + 
+                                                        ('0' + now.getSeconds()).slice(-2)                        
+                                                
+                                                gcode = "; Created using HobbyLaser "+now+"\n\n"
+                                                gcode += "; Laser Speed: " + speedTRVL + " mm/sec\n"
+                                                gcode += "; Travel Speed: " + speedLSR + " mm/sec\n"
+                                                gcode += "; Power: [" + minPWR + ", " + maxPWR + "]\n"
+                                                gcode += `G21; unità in millimetri\n`
+                                                gcode += `G90; posizionamento assoluto\n`                                
+                                                gcode += "G0 X0 Y0" + travelSpeedCmd + "; Torna all'origine\n"
+                                                gcode += "M4; laser ON\n"
+                                                
+                                                if (air !== 0) gcode += "M8; start airAssist\n\n"                    
+
+                                                /*var mirroredData = new Uint8ClampedArray(data.length);
+                                                for (var y = 0; y < height; y++) {
+                                                        for (var x = 0; x < width; x++) {
+                                                                var index = (y * width + x) * 4;
+                                                                var mirroredIndex = ((height - y - 1) * width + x) * 4;
+                                                                mirroredData[mirroredIndex] = data[index];         // R
+                                                                mirroredData[mirroredIndex + 1] = data[index + 1]; // G
+                                                                mirroredData[mirroredIndex + 2] = data[index + 2]; // B
+                                                                mirroredData[mirroredIndex + 3] = data[index + 3]; // A
+                                                        }
+                                                }
+
+                                                var mirroredImageData = new ImageData(mirroredData, width, height)
+                                                data = mirroredImageData.data*/                      
+
+                                                function findActivePixelRange(y){
+                                                        var firstActivePixel = -1
+                                                        var lastActivePixel = -1
+
+                                                        for (var ix = 0; ix < width; ix++){
+                                                                var index = (y * width + ix) * 4
+                                                                var red = data[index];
+                                                                var green = data[index + 1]
+                                                                var blue = data[index + 2]
+                                                                var alpha = data[index + 3]
+
+                                                                var isWhite = (red > 240 && green > 240 && blue > 240)
+                                                                var isTransparent = (alpha <= 10)
+
+                                                                if (!isWhite && !isTransparent){
+                                                                        if (firstActivePixel === -1) firstActivePixel = ix
+                                                                        lastActivePixel = ix
+                                                                }
+                                                        }; return { firstActivePixel, lastActivePixel }
+                                                }
+
+                                                function generatePassGcode(zOffset){
+                                                        for (var yMM = 0; yMM < convertToMM(height); yMM += lineSpacing){
+                                                                var y = Math.round(yMM * 96 / 25.4)
+                                                                if (y >= height) break
+
+                                                                var activePixelRange = findActivePixelRange(y)
+                                                                if (activePixelRange.firstActivePixel === -1) continue
+
+                                                                var startX = activePixelRange.firstActivePixel
+                                                                var endX = activePixelRange.lastActivePixel
+
+                                                                var step = (y % 2 === 0) ? 1 : -1
+                                                                if (y % 2 !== 0) [startX, endX] = [endX, startX]
+
+                                                                var laserOn = false
+                                                                var rowGcode = ""
+                                                                var yCoord = yMM - borderY
+
+                                                                var skipG0 = true
+                                                                for (var ix = startX; ix !== endX + step; ix += step){
+                                                                        var index = (y * width + ix) * 4
+                                                                        var red = data[index];
+                                                                        var green = data[index + 1]
+                                                                        var blue = data[index + 2]
+                                                                        var alpha = data[index + 3]
+
+                                                                        var isWhite = (red > 240 && green > 240 && blue > 240)
+                                                                        var isTransparent = (alpha <= 10)
+
+                                                                        var brightness = red * 0.3 + green * 0.59 + blue * 0.11
+                                                                        var power = (!isWhite && !isTransparent) ? minPWR + (1.0 - brightness / 255.0) * (maxPWR - minPWR) : 0
+
+                                                                        var xCoord = convertToMM(ix) + borderX
+                                                                        if (power > 0){
+                                                                                if (skipG0){
+                                                                                        rowGcode += "G0 X" + xCoord.toFixed(3) + " Y" + (dHeight - yCoord).toFixed(3) + travelSpeedCmd + "\n"
+                                                                                        skipG0 = false
+                                                                                }
+                                                                                rowGcode += "G1 X" + xCoord.toFixed(3) +
+                                                                                            " Y" + (dHeight - yCoord).toFixed(3) +
+                                                                                            " Z" + zOffset.toFixed(3) +
+                                                                                            " S" + power.toFixed(0) +
+                                                                                            laserSpeedCmd + "\n";
+                                                                        } else {
+                                                                                if (laserOn){
+                                                                                        rowGcode += "M5" + "; laser OFF\n"; laserOn = false
+                                                                                }; skipG0 = true
+                                                                        }
+                                                                }; gcode += rowGcode
+                                                        }
+                                                }
+
+                                                for (var pass = 0; pass < passes; pass++){
+                                                        generatePassGcode(pass * zStep)
+                                                }
+                                                
+                                                if (air !== 0) gcode += "M9; stop airAssist\n\n"
+
+                                                gcode += "M5; laser OFF\n"
+                                                gcode += "G0 X0 Y0" + travelSpeedCmd + "; Torna all'origine\n"
+                                                gcode += "M2; Fine del programma\n"                        
+                                                
+                                                sendGCODE(gcode); GCSenderShow()
+                                        } catch(error){console.error(error.message)}               
+                                }
+                                function roundCoord(coord){return Math.round(coord * 10) / 10}
+                                function convertToMM(value, dpi = 96){var mmPerInch = 25.4; return (value / dpi) * mmPerInch}
+
+
+
+                                function download(){
+                                        if (typeof gcode === "undefined") {
+                                                console.error("error: gcode undefined"); return
+                                        }
+
+                                        var fileName = $("#_10").val() || "download"
+                                        if (!fileName.endsWith(".gcode")) {
+                                                fileName += ".gcode"
+                                        }
+
+                                        var blob = new Blob([gcode], { type: "text/plain" })
+                                        var link = document.createElement("a")
+                                        link.href = URL.createObjectURL(blob)
+                                        link.download = fileName
+                                        document.body.appendChild(link)
+                                        link.click(); document.body.removeChild(link)
+                                }
+                                var gcodeText = ""
+                                function sendGCODE(data){
+                                        if(dlBool == true){download()}
+                                        document.getElementById("_10").value = ""
+                                        gcodeText = data; gcode = ""
+                                        calculateBounds(gcodeText)
+                                        gcVIEW(gcodeText); dlBool = false                       
+                                }                                
+                        </script>
+                </div>
+
+
+                <div id="contPreview" style="background:#101010; position:absolute; width:auto; height:60%;
+                left:calc(50% - 200px); top:150px; z-index:470; border: 1px solid #3c3c3c; visibility:hidden">
+                        <!-- Canvas per la preview statica -->
+                        <canvas id="preview">/canvas 
+
+                        <script>
+                                var contPreview = document.getElementById('contPreview');
+                                var contPHeight = contPreview.offsetHeight;
+
+                                var canvasGC = document.getElementById('preview');
+                                canvasGC.width = contPHeight;
+                                canvasGC.height = contPHeight;
+
+                                var contextGC = canvasGC.getContext("2d");
+                                
+                                var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                                var scaleFactor = 1
+                                var offsetX = 0, offsetY = 0
+                                var vectorMode = false
+                                var constantS = null
+                                $("#contPreview").draggable()
+
+                                function calculateBounds(gcodeContent) {
+                                        var lines = gcodeContent.split('\n');
+                                        minX = minY = Infinity
+                                        maxX = maxY = -Infinity
+                                        let sValues = new Set()
+                                        lines.forEach(line => {
+                                                var codes = line.trim().split(' ')
+                                                var xVal = codes.find(c => c.startsWith('X'))
+                                                var yVal = codes.find(c => c.startsWith('Y'))
+                                                var sVal = codes.find(c => c.startsWith('S'))
+                                                if ((codes[0] === 'G0' || codes[0] === 'G1') && sVal){
+                                                        let power = parseInt(sVal.replace('S', ''))
+                                                        sValues.add(power)
+                                                }
+                                                if (xVal && yVal) {
+                                                        var x = parseFloat(xVal.replace('X', ''))
+                                                        var y = parseFloat(yVal.replace('Y', ''))
+                                                        if (!isNaN(x) && !isNaN(y)){
+                                                                minX = Math.min(minX, x)
+                                                                minY = Math.min(minY, y)
+                                                                maxX = Math.max(maxX, x)
+                                                                maxY = Math.max(maxY, y)
+                                                        }
+                                                }
+                                        });
+                                        if (sValues.size === 1) {
+                                                vectorMode = true;
+                                                constantS = [...sValues][0]
+                                        } else {
+                                                vectorMode = false
+                                        }
+                                        var width = maxX - minX
+                                        var height = maxY - minY
+                                        var scaleX = (canvasGC.width - 20) / width
+                                        var scaleY = (canvasGC.height - 20) / height
+                                        scaleFactor = Math.min(scaleX, scaleY)
+                                        offsetX = (canvasGC.width - width * scaleFactor) / 2 - minX * scaleFactor
+                                        offsetY = (canvasGC.height - height * scaleFactor) / 2 - minY * scaleFactor
+                                }
+
+                                function gcVIEW(gcodeContent) {
+                                        //console.log(gcodeContent)
+                                        contextGC.clearRect(0, 0, canvasGC.width, canvasGC.height)
+                                        var lines = gcodeContent.split('\n')
+                                        var gindex = 0
+                                        let prevX = null, prevY = null
+
+                                        function render() {
+                                                for (var i = gindex; i < lines.length; i++){
+                                                        var codes = lines[i].trim().split(' ')
+                                                        var isG0 = codes[0] === 'G0'
+                                                        var isG1 = codes[0] === 'G1'
+
+                                                        if (isG0 || isG1){
+                                                                var xVal = codes.find(c => c.startsWith('X'))
+                                                                var yVal = codes.find(c => c.startsWith('Y'))
+                                                                var sVal = codes.find(c => c.startsWith('S'))
+                                                                var power = sVal ? parseInt(sVal.replace('S', '')) : 0
+                                                                var gray
+
+                                                                if (isG1) {
+                                                                        if (vectorMode){
+                                                                                gray = Math.round((power / constantS) * 100)
+                                                                        } else {
+                                                                                gray = 255 - Math.round((power / 1000) * 255)
+                                                                        }
+                                                                }
+
+                                                                if (xVal && yVal){
+                                                                        var x = parseFloat(xVal.replace('X', '')) * scaleFactor + offsetX
+                                                                        var y = canvasGC.height - (parseFloat(yVal.replace('Y', '')) * scaleFactor + offsetY)
+
+                                                                        if (prevX !== null && prevY !== null){
+                                                                                contextGC.beginPath();
+                                                                                contextGC.strokeStyle = isG1 ? `rgb(${gray}, ${gray}, ${gray})` : "#000"
+                                                                                contextGC.moveTo(prevX, prevY)
+                                                                                contextGC.lineTo(x, y)
+                                                                                contextGC.stroke()
+                                                                        }
+                                                                        prevX = x; prevY = y
+                                                                }
+                                                        }
+                                                }
+                                        }; render()
+                                }
+
+
+                                var MAX_RETRIES = 2, RETRY_DELAY = 100
+                                var port, writer, currentIndex = 0, isPaused = false
+                                var stopRequested = false, isSending = false, lastReceivedLine = ""
+
+                                var GCH = $('#gcBtn').height()
+                                var rawGcode = ""
+                                var sentGCodeLines = 0
+                                var totalGCodeLines = 0
+                                var nLine = 0, lines = 0
+                                var grblConnected = false
+
+                                var lastPos = null
+                                var progressBar = document.getElementById("progress-bar")                
+                                    
+                                function updateProgressBar() {
+                                        if (totalGCodeLines > 0) {
+                                                var percentage = (sentGCodeLines / totalGCodeLines) * 100;
+                                                progressBar.style.width = percentage + "%";
+                                        }
+                                }
+
+                                var maxLogLines = 20, logBuffer = [];  
+                                var lastLogEntry = ""
+                                function drawLine(x1, y1, x2, y2, duration) {
+                                        let startTime = null;
+                                        function step(timestamp) {
+                                                if (!startTime) startTime = timestamp;
+                                                let progress = (timestamp - startTime) / duration;
+                                                
+                                                if (progress > 1) progress = 1;
+
+                                                let xCurrent = x1 + (x2 - x1) * progress;
+                                                let yCurrent = y1 + (y2 - y1) * progress;
+
+                                                contextGC.beginPath();
+                                                contextGC.moveTo(x1, y1);
+                                                contextGC.lineTo(x2, y2);
+                                                contextGC.strokeStyle = "red";
+                                                contextGC.lineWidth = 1.1;
+                                                contextGC.stroke();
+
+                                                if (progress < 1) {
+                                                        requestAnimationFrame(step)
+                                                }
+                                        }; requestAnimationFrame(step);
+                                }
+                                                        
+                                document.getElementById('connect').addEventListener('click', async () => {
+                                        try {
+                                                port = await navigator.serial.requestPort();
+                                                const info = port.getInfo()
+
+                                                await port.open({baudRate: 115200})
+                                                writer = port.writable.getWriter()
+                                                reader = port.readable.getReader()
+
+                                                $("#portName").text(`VID ${info.usbVendorId || "N/A"}, PID ${info.usbProductId || "N/A"}`)
+
+                                                console.log("connect!")
+                                                readSerialData()
+                                        } catch (err) {
+                                                console.error("error: " + err)
+                                        }
+                                });
+
+                                document.getElementById('send').addEventListener('click', async () => {
+                                        if (port && gcodeText.trim()) {
+                                                currentIndex = 0
+                                                isPaused = false
+                                                stopRequested = false
+                                                isSending = true
+                                                sendNextLine()
+                                        } else {
+                                                console.log("connect to device");
+                                        }
+                                });
+
+                                document.getElementById('pause').addEventListener('click', () => {
+                                        isPaused = true; console.log(" paused ...")
+                                })
+
+                                document.getElementById('resume').addEventListener('click', () => {
+                                        if (isPaused) {
+                                                isPaused = false;
+                                                console.log(" resume ...");
+                                                sendNextLine();
+                                        }
+                                })
+
+                                document.getElementById('stop').addEventListener('click', async () => {
+                                        stopRequested = true
+                                        isSending = false
+                                        console.log(" stop")
+                                        if (port) {
+                                                await reader.cancel()
+                                                reader.releaseLock()
+                                                writer.releaseLock()
+                                                await port.close()
+                                                port = null
+                                                console.log(" close")
+                                        }
+                                });
+
+                                async function sendNextLine() {
+                                        if (stopRequested || isPaused) return;
+
+                                        var lines = gcodeText.split('\n')
+                                        if (totalGCodeLines === 0) {
+                                                totalGCodeLines = lines.length
+                                        }
+                                        
+                                        if (currentIndex < lines.length) {
+                                                const line = lines[currentIndex].trim()
+                                                if (line && !line.startsWith(';')) {
+                                                        await sendCommand(line + "\n")
+                                                        //console.log(" submit: " + line)
+                                                        sentGCodeLines++;
+                                                        updateProgressBar()
+                                                        await waitResponse(line, 0)
+                                                } else {
+                                                        currentIndex++; sendNextLine()
+                                                        sentGCodeLines++; updateProgressBar()                                                     
+                                                }
+                                        } else {
+                                                isSending = false; canvasCleared = false
+                                                console.log(" transmission completed");
+                                                sentGCodeLines = totalGCodeLines; updateProgressBar();                                               
+                                        }
+                                }                                
+
+                                async function sendCommand(command) {
+                                        if (port && writer) {
+                                                await writer.write(new TextEncoder().encode(command))
+                                        }
+                                }
+
+                                var maxLogLines = 20, logBuffer = [];  
+                                var lastLogEntry = ""
+                                function drawLine(x1, y1, x2, y2, duration) {
+                                        let startTime = null;
+                                        function step(timestamp) {
+                                                if (!startTime) startTime = timestamp;
+                                                let progress = (timestamp - startTime) / duration;
+                                                
+                                                if (progress > 1) progress = 1;
+
+                                                let xCurrent = x1 + (x2 - x1) * progress;
+                                                let yCurrent = y1 + (y2 - y1) * progress;
+
+                                                contextGC.beginPath();
+                                                contextGC.moveTo(x1, y1);
+                                                contextGC.lineTo(x2, y2);
+                                                contextGC.strokeStyle = "#ccc";
+                                                contextGC.lineWidth = 1.1;
+                                                contextGC.stroke();
+
+                                                if (progress < 1) {
+                                                        requestAnimationFrame(step)
+                                                }
+                                        }; requestAnimationFrame(step);
+                                }                               
+
+                                function toCanvasCoords(x, y) {
+                                        return {
+                                                x: x * scaleFactor + offsetX,
+                                                y: canvasGC.height - (y * scaleFactor + offsetY)
+                                        }
+                                }
+
+                                var canvasCleared = false
+                                async function waitResponse(line, attempts = 0) {
+                                        if (!canvasCleared) {
+                                                contextGC.clearRect(0, 0, canvasGC.width, canvasGC.height)
+                                                lastPos = null; canvasCleared = true
+                                        }
+
+                                        if (attempts >= MAX_RETRIES) {
+                                                console.log(`Timeout: no response after ${MAX_RETRIES} attempts`)
+                                                return
+                                        }
+
+                                        try {
+                                                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY))
+
+                                                if (lastReceivedLine.trim()) {
+                                                        console.log(`↓ Sent: ${line}`)
+                                                        //console.log(`↑ Response: ${lastReceivedLine}`)
+
+                                                        var xMatch = line.match(/X([-+]?[0-9]*\.?[0-9]+)/)
+                                                        var yMatch = line.match(/Y([-+]?[0-9]*\.?[0-9]+)/)
+                                                        var sMatch = line.match(/S(\d+)/)
+                                                        var gMatch = line.match(/G([01])/)
+
+                                                        if (xMatch && yMatch && gMatch) {
+                                                                var xValue = parseFloat(xMatch[1])
+                                                                var yValue = parseFloat(yMatch[1])
+                                                                var { x: xCanvas, y: yCanvas } = toCanvasCoords(xValue, yValue)
+
+                                                                var isG1 = gMatch[1] === '1'
+                                                                var isG0 = gMatch[1] === '0'
+                                                                var power = sMatch ? parseInt(sMatch[1]) : 0
+
+                                                                var gray = 0
+                                                                if (isG1) {
+                                                                        gray = vectorMode
+                                                                                ? Math.round((power / constantS) * 100)
+                                                                                : 255 - Math.round((power / 1000) * 255)
+                                                                }
+
+                                                                contextGC.beginPath()
+
+                                                                if (isG1) {
+                                                                        contextGC.strokeStyle = `rgba(${gray}, ${gray}, ${gray}, ${1})`
+                                                                } else if (isG0) {
+                                                                        contextGC.strokeStyle = `rgba(0, 0, 0, 0.4)`
+                                                                }
+
+                                                                contextGC.moveTo(lastPos?.x ?? xCanvas, lastPos?.y ?? yCanvas)
+                                                                contextGC.lineTo(xCanvas, yCanvas)
+                                                                contextGC.stroke()
+
+                                                                lastPos = { x: xCanvas, y: yCanvas }
+                                                        }
+
+                                                        currentIndex++
+                                                        sendNextLine()
+
+                                                } else if (lastReceivedLine.toLowerCase().startsWith("error:")) {
+                                                        var errorCode = lastReceivedLine.split(":")[1].trim()
+                                                        console.log(`GRBL error: ${errorCode}`)
+                                                        if (attempts < MAX_RETRIES) {
+                                                                console.log(`attempt ${attempts + 1} di invio della riga.`)
+                                                                await sendGCodeLine(line, attempts + 1)
+                                                        } else {
+                                                                console.error(`fatal error: ${errorCode}`)
+                                                        }
+
+                                                } else if (lastReceivedLine.toLowerCase().startsWith("alarm:")) {
+                                                        var alarmCode = parseInt(lastReceivedLine.match(/\d+/)[0])
+                                                        console.log(`GRBL alarm: ${alarmCode}`)
+
+                                                        if ([2, 4, 5, 7, 10].includes(alarmCode)) {
+                                                                console.log(`alarm automatic reset ${alarmCode}...`)
+                                                                await softReset()
+                                                        } else if ([1, 3, 6].includes(alarmCode)) {
+                                                                console.log(`soft reset + homing ${alarmCode}...`)
+                                                                await softReset()
+                                                                await homing()
+                                                        } else {
+                                                                console.log(`unknown alarm, manual check`)
+                                                        }
+
+                                                } else {
+                                                        console.log(`Invalid response: ${lastReceivedLine}`)
+                                                }
+
+                                        } catch (error) {
+                                                console.error(`Error: ${error.message}`)
+                                        }
+                                }
+
+                                async function softReset() {
+                                        console.log(" soft reset...")
+                                        await sendGCodeLine("~")
+                                }
+
+                                async function homing() {
+                                        console.log(" homing...")
+                                        await sendGCodeLine("$H")
+                                }
+
+                                async function readSerialData() {
+                                        let buffer = ""
+                                        try {
+                                                while (true) {
+                                                        const { value, done } = await reader.read()
+                                                        if (done) break;
+                                                        buffer += new TextDecoder().decode(value)
+                                                        const lines = buffer.split("\n")
+                                                        buffer = lines.pop()
+                                                        for (const line of lines) {
+                                                                const trimmedLine = line.trim()
+                                                                if (trimmedLine) {
+                                                                        lastReceivedLine = trimmedLine
+                                                                }
+                                                        }
+                                                }
+                                        } catch (error) {
+                                                console.error(" serial error: " + error)
+                                        } finally {
+                                                reader.releaseLock()
+                                        }
+                                }
+                        </script>
+                </div>                               
+                        
+        </body>             
+</html>            
+
+
+
+<!-- 
+-->
+

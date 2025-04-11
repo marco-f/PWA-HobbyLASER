@@ -1,0 +1,91 @@
+<!-- /HTML/android.html -->
+<!DOCTYPE html>
+<html xml:lang="en" lang="en">
+        <head>
+                <!-- Meta tags to prevent caching -->
+                <meta http-equiv="cache-control" content="max-age=0">
+                <meta http-equiv="cache-control" content="no-cache">
+                <meta http-equiv="expires" content="-1">
+                <meta http-equiv="expires" content="Tue, 01 Jan 1980 11:00:00 GMT">
+                <meta http-equiv="pragma" content="no-cache">
+                <meta charset="UTF-8">
+
+                <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+
+                <!-- style -->    
+                <link rel="stylesheet" href="../CSS/styles.css">
+                <link rel="stylesheet" href="../CSS/drawing.css">
+                <link rel="stylesheet" href="../CSS/jquery.css">
+
+                <!-- third parties -->
+                <script src="../JS/src/jquery.js"></script>
+                <script src="../JS/src/jquery-ui.js"></script>
+                <script src="../JS/src/fabric.js"></script>               
+                <script src="../JS/ace/ace.js"></script>                
+                <script src="../JS/src/clipper.js"></script>         
+                <script src="../JS/src/opentype.js"></script>
+                <script src="../JS/src/sortable.js"></script>   
+                <script src="../JS/src/potrace.js"></script>
+                <script src="../JS/src/polyfill.js"></script>
+                <script src="../JS/src/drawing.js"></script>
+                <script src="../JS/src/ruler.js"></script>
+        </head>
+  <style>
+    body {
+      margin: 0;
+      background-color: #080808;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background-color: #101010;
+      border-bottom: 1px solid #222;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .header-button {
+      background-color: #1e90ff;
+      color: white;
+      border: none;
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .header-button:hover {
+      background-color: #1c7ed6;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header-button {
+        margin-top: 0.5rem;
+        width: 100%;
+      }
+    }
+  </style>
+
+<body>
+
+  <header>
+    <div class="logo">LOGO</div>
+    <button class="header-button">Azione</button>
+  </header>
+
+</body>
+</html>
