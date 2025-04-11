@@ -50,7 +50,7 @@ A **Progressive Web App (PWA)** designed for the **HobbyLaser** project. This we
 ## Live Demo
 
 You can view a live demo of the PWA here:  
-[https://marco-f.github.io/PWA-HobbyLASER/](https://marco-f.github.io/PWA-HobbyLASER/)
+[https://marco-f.github.io/PWA-HobbyLASER/](https://marco-f.github.io/PWA-HobbyLASER/index.html)
 
 ## How to Run the Project Locally
 
@@ -97,7 +97,7 @@ Acknowledgments
 Special thanks to the open-source community for the tools and libraries used in this project.
 
 ## Documentation
-For a more comprehensive documentation on how to use and contribute to the project, please consult the [Wiki](https://github.com/marco-f/PWA-HobbyLASER/wiki/1_home).
+For a more comprehensive documentation on how to use and contribute to the project, please consult the [Wiki](https://github.com/marco-f/PWA-HobbyLASER/wiki).
 
 ---
 
